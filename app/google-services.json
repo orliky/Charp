@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "348640046615",
+    "firebase_url": "https://charp-53629.firebaseio.com",
+    "project_id": "charp-53629",
+    "storage_bucket": "charp-53629.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:348640046615:android:2f9fdb0a04c0df18",
+        "android_client_info": {
+          "package_name": "com.yso.charp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "348640046615-6j0vfj8akuq5l8kv72mdiqmsv9h0ocmh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yso.charp",
+            "certificate_hash": "0e7945b80ebd76e67954eeb3e4a0eb2cf7efb498"
+          }
+        },
+        {
+          "client_id": "348640046615-bmuud6ep043gu3gigkf6bfe2e3221r4q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCY4fnRXZd6OVZY3Q1mt4Of1DLQc0B1YoI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "348640046615-bmuud6ep043gu3gigkf6bfe2e3221r4q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
