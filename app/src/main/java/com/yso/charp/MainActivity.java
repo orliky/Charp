@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity
 
             chatID =  FirebaseDatabase.getInstance().getReference().child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).push().getKey();
 
+            
             /*String UID = FirebaseAuth.getInstance().getCurrentUser().getUid();
             DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
             Query query = rootRef.child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName()).child(chatID).orderByChild(UID).equalTo(false);
