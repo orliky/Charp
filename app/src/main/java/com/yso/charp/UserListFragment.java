@@ -61,7 +61,7 @@ public class UserListFragment extends Fragment
             }
 
             @Override
-            protected void populateView(View v, final User model, int position)
+            protected void populateView(View v, final User model, final int position)
             {
                 if (!model.getUID().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
                 {
@@ -81,7 +81,7 @@ public class UserListFragment extends Fragment
                         public void onClick(View v)
                         {
                             Bundle bundle = new Bundle();
-                            bundle.putString("chat_with", key[0]); // Put anything what you want
+                            bundle.putString("user_id", getRef(position).getKey()); // Put anything what you want
 
                             ChatFragment chatFragment = new ChatFragment();
                             chatFragment.setArguments(bundle);

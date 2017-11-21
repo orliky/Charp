@@ -82,19 +82,18 @@ public class ChatListFragment extends Fragment
             }
         };*/
 
-        final String[] key = new String[1];
+//        final String[] key = new String[1];
         adapter = new FirebaseListAdapter<User>(getActivity(), User.class, R.layout.chat, FirebaseDatabase.getInstance().getReference().child("Users"))
         {
             @Override
             protected User parseSnapshot(DataSnapshot snapshot)
             {
-                key[0] = snapshot.getKey();
-                Log.d("KeyYossi", key[0]);
+//                key[0] = snapshot.getKey();
                 return super.parseSnapshot(snapshot);
             }
 
             @Override
-            protected void populateView(View v, final User model, int position)
+            protected void populateView(View v, final User model, final int position)
             {
                 if (!model.getUID().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
                 {
@@ -107,7 +106,7 @@ public class ChatListFragment extends Fragment
                         public void onClick(View v)
                         {
                             Bundle bundle = new Bundle();
-                            bundle.putString("chat_with", key[0]); // Put anything what you want
+                            bundle.putString("user_id", getRef(position).getKey()); // Put anything what you want
 
                             ChatFragment chatFragment = new ChatFragment();
                             chatFragment.setArguments(bundle);
