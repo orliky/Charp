@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -88,6 +89,7 @@ public class ChatListFragment extends Fragment
             protected User parseSnapshot(DataSnapshot snapshot)
             {
                 key[0] = snapshot.getKey();
+                Log.d("KeyYossi", key[0]);
                 return super.parseSnapshot(snapshot);
             }
 

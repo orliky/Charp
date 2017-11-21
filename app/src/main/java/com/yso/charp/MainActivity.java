@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity
                 getSupportFragmentManager().beginTransaction().add(R.id.container, new ChatListFragment()).commit();
 
 
-                FirebaseDatabase.getInstance().getReference().child("Users").push().
+                FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).
                         setValue(new User(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseAuth.getInstance().getCurrentUser().getEmail(), FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
             }
