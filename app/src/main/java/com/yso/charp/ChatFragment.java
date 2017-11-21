@@ -20,7 +20,11 @@ import android.widget.Toast;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
@@ -78,7 +82,7 @@ public class ChatFragment extends Fragment
             {
                 // Read the input field and push a new instance
                 // of ChatMessage to the Firebase database
-                FirebaseDatabase.getInstance().getReference().child("Chats").child(chatWith).push()
+                FirebaseDatabase.getInstance().getReference().child("Users").child(chatWith).child("Chat").push()
                         .setValue(new ChatMessage(input.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getDisplayName()));
 
                 // Clear the input
@@ -91,7 +95,7 @@ public class ChatFragment extends Fragment
     {
         if(chatWith != null)
         {
-            adapter = new FirebaseListAdapter<ChatMessage>(getActivity(), ChatMessage.class, R.layout.message, FirebaseDatabase.getInstance().getReference().child("Chats").child(chatWith))
+            adapter = new FirebaseListAdapter<ChatMessage>(getActivity(), ChatMessage.class, R.layout.message, FirebaseDatabase.getInstance().getReference().child("Users").child(chatWith).child("Chat"))
             {
                 @Override
                 protected void populateView(View v, ChatMessage model, int position)

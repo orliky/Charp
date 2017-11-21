@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.FirebaseDatabase;
 
 
@@ -49,8 +50,16 @@ public class UserListFragment extends Fragment
 
     private void displayUserList()
     {
+        final String[] key = new String[1];
         adapter = new FirebaseListAdapter<User>(getActivity(), User.class, R.layout.user, FirebaseDatabase.getInstance().getReference().child("Users"))
         {
+            @Override
+            protected User parseSnapshot(DataSnapshot snapshot)
+            {
+                key[0] = snapshot.getKey();
+                return super.parseSnapshot(snapshot);
+            }
+
             @Override
             protected void populateView(View v, final User model, int position)
             {
@@ -72,7 +81,7 @@ public class UserListFragment extends Fragment
                         public void onClick(View v)
                         {
                             Bundle bundle = new Bundle();
-                            bundle.putString("chat_with", model.getName()); // Put anything what you want
+                            bundle.putString("chat_with", key[0]); // Put anything what you want
 
                             ChatFragment chatFragment = new ChatFragment();
                             chatFragment.setArguments(bundle);

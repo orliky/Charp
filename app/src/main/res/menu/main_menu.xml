@@ -11,4 +11,9 @@
         android:title="Users"
         app:showAsAction="never"/>
 
+    <item
+        android:id="@+id/menu_chats_list"
+        android:title="Chats"
+        app:showAsAction="never"/>
+
 </menu>

@@ -1,6 +1,7 @@
 package com.yso.charp;
 
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -23,7 +24,7 @@ public class ChatListFragment extends Fragment
 {
 
     private ListView listOfChats;
-    private FirebaseListAdapter<String> adapter;
+    private FirebaseListAdapter<User> adapter;
 
     public ChatListFragment()
     {
@@ -51,8 +52,8 @@ public class ChatListFragment extends Fragment
     private void displayChatList()
     {
 
-        adapter = new FirebaseListAdapter<String>
-                (getActivity(), String.class, android.R.layout.simple_list_item_1, FirebaseDatabase.getInstance().getReference().child("Chats") ) {
+       /* adapter = new FirebaseListAdapter<String>
+                (getActivity(), String.class, android.R.layout.simple_list_item_1, FirebaseDatabase.getInstance().getReference().child("Users") ) {
 
             @Override
             protected String parseSnapshot(DataSnapshot snapshot) {
@@ -77,6 +78,52 @@ public class ChatListFragment extends Fragment
                         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, chatFragment).commit();
                     }
                 });
+            }
+        };*/
+
+        final String[] key = new String[1];
+        adapter = new FirebaseListAdapter<User>(getActivity(), User.class, R.layout.chat, FirebaseDatabase.getInstance().getReference().child("Users"))
+        {
+            @Override
+            protected User parseSnapshot(DataSnapshot snapshot)
+            {
+                key[0] = snapshot.getKey();
+                return super.parseSnapshot(snapshot);
+            }
+
+            @Override
+            protected void populateView(View v, final User model, int position)
+            {
+                if (!model.getUID().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
+                {
+                    TextView name = v.findViewById(R.id.chat_name);
+                    name.setText(model.getName());
+
+                    v.setOnClickListener(new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            Bundle bundle = new Bundle();
+                            bundle.putString("chat_with", key[0]); // Put anything what you want
+
+                            ChatFragment chatFragment = new ChatFragment();
+                            chatFragment.setArguments(bundle);
+                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, chatFragment).commit();
+                        }
+                    });
+                }
+                else
+                {
+                    TextView name = v.findViewById(R.id.chat_name);
+                    name.setText("You");
+                }
+            }
+
+            @Override
+            protected void onDataChanged()
+            {
+                super.onDataChanged();
             }
         };
 
