@@ -111,9 +111,9 @@ public class ChatFragment extends Fragment {
                 @Override
                 protected void populateView(View v, ChatMessage model, int position) {
                     // Get references to the views of message.xml
-                    TextView messageText = (TextView) v.findViewById(R.id.message_text);
-                    TextView messageUser = (TextView) v.findViewById(R.id.message_from_user);
-                    TextView messageTime = (TextView) v.findViewById(R.id.message_time);
+                    TextView messageText = v.findViewById(R.id.message_text);
+                    TextView messageUser = v.findViewById(R.id.message_from_user);
+                    TextView messageTime = v.findViewById(R.id.message_time);
 
                     // Set their text
                     messageText.setText(model.getMessageText());

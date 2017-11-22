@@ -15,17 +15,12 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.List;
 
-/**
- * Created by AkshayeJH on 24/07/17.
- */
-
 public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.MessageViewHolder>{
 
 
     private List<ChatMessage> mMessageList;
-    private DatabaseReference mUserDatabase;
 
-    public ChatMessageAdapter(List<ChatMessage> mMessageList) {
+    ChatMessageAdapter(List<ChatMessage> mMessageList) {
 
         this.mMessageList = mMessageList;
 
@@ -41,19 +36,19 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
     }
 
-    public class MessageViewHolder extends RecyclerView.ViewHolder {
+    class MessageViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView messageText;
-        public TextView displayName;
-        public TextView messageTime;
+        TextView messageText;
+        TextView displayName;
+        TextView messageTime;
 
-        public MessageViewHolder(View view) {
+        MessageViewHolder(View view) {
             super(view);
 
 
-            messageText = (TextView) view.findViewById(R.id.message_text);
-            displayName = (TextView) view.findViewById(R.id.message_from_user);
-            messageTime = (TextView) view.findViewById(R.id.message_time);
+            messageText = view.findViewById(R.id.message_text);
+            displayName = view.findViewById(R.id.message_from_user);
+            messageTime = view.findViewById(R.id.message_time);
 
         }
     }
@@ -64,13 +59,13 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         ChatMessage c = mMessageList.get(i);
         String from_user = c.getMessageUser();
 
-        mUserDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(from_user);
+        DatabaseReference userDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(from_user);
 
-        mUserDatabase.addValueEventListener(new ValueEventListener() {
+        userDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                String name = dataSnapshot.getKey().toString();
+                String name = dataSnapshot.getKey();
                 viewHolder.displayName.setText(name);
             }
 

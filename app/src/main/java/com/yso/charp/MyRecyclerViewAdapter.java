@@ -7,9 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by Admin on 21-Nov-17.

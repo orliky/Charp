@@ -42,8 +42,4 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:10.2.0'
 }
 
-
-
-
-
 apply plugin: 'com.google.gms.google-services'

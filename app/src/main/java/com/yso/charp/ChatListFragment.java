@@ -5,39 +5,69 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ChatListFragment extends Fragment
+@SuppressLint ("ValidFragment")
+public class ChatListFragment extends Fragment implements MyRecyclerViewAdapter.ItemClickListener
 {
 
-    private ListView listOfChats;
-    private FirebaseListAdapter<User> adapter;
-
-    public ChatListFragment()
+    public enum TypeList
     {
-        // Required empty public constructor
+        USERS, CHATS
+    }
+
+    private TypeList mTypeList;
+    private RecyclerView listOfChats;
+    private HashMap<String, User> userList = new HashMap<>();
+    private MyRecyclerViewAdapter mAdapter;
+
+
+    public ChatListFragment(TypeList typeList)
+    {
+        mTypeList = typeList;
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        // Inflate the layout for this fragment
+        View x = getView(inflater, container);
+        if (x != null)
+        {
+            return x;
+        }
         return inflater.inflate(R.layout.fragment_chart_list, container, false);
+    }
+
+    @Nullable
+    private View getView(LayoutInflater inflater, ViewGroup container)
+    {
+        switch (mTypeList)
+        {
+            case CHATS:
+                return inflater.inflate(R.layout.fragment_chart_list, container, false);
+
+            case USERS:
+                return inflater.inflate(R.layout.fragment_user_list, container, false);
+        }
+        return null;
     }
 
     @Override
@@ -45,122 +75,69 @@ public class ChatListFragment extends Fragment
     {
         super.onViewCreated(view, savedInstanceState);
 
-        listOfChats = view.findViewById(R.id.list_of_chats);
+        initAdapter(view);
+
+        mAdapter.setClickListener(this);
+        listOfChats.setLayoutManager(new LinearLayoutManager(getActivity()));
+        listOfChats.setAdapter(mAdapter);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(listOfChats.getContext(), new LinearLayoutManager(getContext()).getOrientation());
+        listOfChats.addItemDecoration(dividerItemDecoration);
 
         displayChatList();
+    }
+
+    private void initAdapter(View view)
+    {
+        switch (mTypeList)
+        {
+            case CHATS:
+                mAdapter = new MyRecyclerViewAdapter(getContext(), userList, MyRecyclerViewAdapter.TYPE_CHATS);
+                listOfChats = view.findViewById(R.id.list_of_chats);
+                break;
+
+            case USERS:
+                mAdapter = new MyRecyclerViewAdapter(getContext(), userList, MyRecyclerViewAdapter.TYPE_USERS);
+                listOfChats = view.findViewById(R.id.list_of_users);
+                break;
+        }
     }
 
     private void displayChatList()
     {
 
-       /* adapter = new FirebaseListAdapter<String>
-                (getActivity(), String.class, android.R.layout.simple_list_item_1, FirebaseDatabase.getInstance().getReference().child("Users") ) {
-
+        FirebaseDatabase.getInstance().getReference().child("Users").addValueEventListener(new ValueEventListener()
+        {
             @Override
-            protected String parseSnapshot(DataSnapshot snapshot) {
-                return snapshot.getKey();
-            }
-
-            @Override
-            protected void populateView(View v, final String s, int position) {
-                TextView text = (TextView)v.findViewById(android.R.id.text1);
-                text.setText(s);
-
-                v.setOnClickListener(new View.OnClickListener()
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren())
                 {
-                    @Override
-                    public void onClick(View v)
+                    User user = snapshot.getValue(User.class);
+                    if (!user.getUID().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
                     {
-                        Bundle bundle = new Bundle();
-                        bundle.putString("chat_with", s); // Put anything what you want
-
-                        ChatFragment chatFragment = new ChatFragment();
-                        chatFragment.setArguments(bundle);
-                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, chatFragment).commit();
+                        userList.put(snapshot.getKey(), user);
                     }
-                });
-            }
-        };*/
-
-//        final String[] key = new String[1];
-        adapter = new FirebaseListAdapter<User>(getActivity(), User.class, R.layout.chat, FirebaseDatabase.getInstance().getReference().child("Users"))
-        {
-            @Override
-            protected User parseSnapshot(DataSnapshot snapshot)
-            {
-//                key[0] = snapshot.getKey();
-                return super.parseSnapshot(snapshot);
-            }
-
-            @Override
-            protected void populateView(View v, final User model, final int position)
-            {
-                if (!model.getUID().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
-                {
-                    TextView name = v.findViewById(R.id.chat_name);
-                    name.setText(model.getName());
-
-                    v.setOnClickListener(new View.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(View v)
-                        {
-                            Bundle bundle = new Bundle();
-                            bundle.putString("user_id", getRef(position).getKey()); // Put anything what you want
-
-                            ChatFragment chatFragment = new ChatFragment();
-                            chatFragment.setArguments(bundle);
-                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, chatFragment).commit();
-                        }
-                    });
                 }
-                else
-                {
-                    TextView name = v.findViewById(R.id.chat_name);
-                    name.setText("You");
-                }
+                mAdapter.setItems(userList);
             }
 
             @Override
-            protected void onDataChanged()
+            public void onCancelled(DatabaseError databaseError)
             {
-                super.onDataChanged();
+
             }
-        };
-
-        /*adapter = new FirebaseListAdapter<Chat>(getActivity(), Chat.class, R.layout.chat, FirebaseDatabase.getInstance().getReference().child("Chats"))
-        {
-            @Override
-            protected void populateView(View v, final Chat model, int position)
-            {
-                if (!model.getUID().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
-                {
-                    TextView name = v.findViewById(R.id.chat_name);
-                    name.setText(model.getName());
-
-                    v.setOnClickListener(new View.OnClickListener()
-                    {
-                        @Override
-                        public void onClick(View v)
-                        {
-                            Bundle bundle = new Bundle();
-                            bundle.putString("chat_with", model.getUID()); // Put anything what you want
-
-                            ChatFragment chatFragment = new ChatFragment();
-                            chatFragment.setArguments(bundle);
-                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, chatFragment).commit();
-                        }
-                    });
-                }
-            }
-
-            @Override
-            protected void onDataChanged()
-            {
-                super.onDataChanged();
-            }
-        };*/
-        listOfChats.setAdapter(adapter);
+        });
     }
 
+    @Override
+    public void onItemClick(String key)
+    {
+        Bundle bundle = new Bundle();
+        bundle.putString("user_id", key);
+
+        ChatFragment chatFragment = new ChatFragment();
+        chatFragment.setArguments(bundle);
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, chatFragment).commit();
+    }
 }
