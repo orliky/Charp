@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@id/fab">
+        android:layout_toStartOf="@id/fab">
 
         <EditText
             android:id="@+id/input"

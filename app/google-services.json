@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "348640046615-3qg6bt4o3mkgi5edt0785m8sg77c8it7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yso.charp",
+            "certificate_hash": "449d1087bc7be4559d259cc2532cf49a19ff520c"
+          }
+        },
+        {
           "client_id": "348640046615-6j0vfj8akuq5l8kv72mdiqmsv9h0ocmh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
