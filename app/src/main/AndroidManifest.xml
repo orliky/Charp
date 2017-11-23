@@ -25,6 +25,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".PhoneAuthActivity"
+                  android:theme="@style/AppTheme.NoActionBar"/>
 
         <activity android:name=".NewVersion.MainActivity1"
                   android:theme="@style/AppTheme.NoActionBar">
