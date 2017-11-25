@@ -77,7 +77,7 @@ public class ProfileActivity extends AppCompatActivity
 
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setTitle("Loading User Data");
-        mProgressDialog.setMessage("Please wait while we load the user data.");
+        mProgressDialog.setMessage("Please wait while we load the user_list_item data.");
         mProgressDialog.setCanceledOnTouchOutside(false);
         mProgressDialog.show();
 

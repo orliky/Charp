@@ -1,4 +1,4 @@
-package com.yso.charp;
+package com.yso.charp.model;
 
 import java.util.Date;
 

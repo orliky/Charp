@@ -1,4 +1,4 @@
-package com.yso.charp;
+package com.yso.charp.mannager;
 
 import android.content.Context;
 import android.util.Log;

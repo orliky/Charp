@@ -193,7 +193,7 @@ public class ChatActivity extends AppCompatActivity
 
     private void loadMessages() {
 
-        mRootRef.child("messages").child(mCurrentUserId).child(mChatUser).addChildEventListener(new ChildEventListener() {
+        mRootRef.child("Messages").child(mCurrentUserId).child(mChatUser).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 

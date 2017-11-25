@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -10,10 +10,12 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:backgroundTint="@color/authui_colorPrimaryDark"
         android:clickable="true"
-        android:src="@drawable/com_facebook_send_button_icon"
+        android:src="@drawable/send"
         android:tint="@android:color/white"
-        app:fabSize="mini"/>
+        app:backgroundTint="@android:color/white"
+        app:fabSize="mini" />
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -26,8 +28,7 @@
             android:id="@+id/input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Input"
-            />
+            android:hint="Input" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.v7.widget.RecyclerView
@@ -38,8 +39,9 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginBottom="16dp"
+        android:layout_marginTop="10dp"
         android:divider="@android:color/transparent"
-        android:dividerHeight="16dp"/>
+        android:dividerHeight="16dp" />
 
 
 </RelativeLayout>

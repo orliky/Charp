@@ -1,4 +1,4 @@
-package com.yso.charp;
+package com.yso.charp.activity;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.view.Menu;
@@ -14,11 +13,10 @@ import android.view.MenuItem;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
+import com.yso.charp.fragment.ChatListFragment;
+import com.yso.charp.fragment.UserListFragment;
+import com.yso.charp.R;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -33,7 +31,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (FirebaseAuth.getInstance().getCurrentUser() == null || FirebaseAuth.getInstance().getCurrentUser().getDisplayName().equals(""))
+        if (FirebaseAuth.getInstance().getCurrentUser() == null)
         {
             // Start sign in/sign up activity
 //            startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().build(), SIGN_IN_REQUEST_CODE);
@@ -48,7 +46,7 @@ public class MainActivity extends AppCompatActivity
             // a welcome Toast
             Toast.makeText(this, "Welcome " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), Toast.LENGTH_LONG).show();
 
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, new ChatListFragment(ChatListFragment.TypeList.CHATS)).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, new ChatListFragment()).commit();
 
 
             /*//            chatID = FirebaseDatabase.getInstance().getReference().child().push().getKey();
@@ -63,10 +61,10 @@ public class MainActivity extends AppCompatActivity
                     String messageID = dataSnapshot.getKey();
                     setNotification(messageID);
                     //TODO: Handle Notification here, using the messageID
-                    // A datasnapshot received here will be a new message that the user has not read
-                    // If you want to display data about the message or chat,
+                    // A datasnapshot received here will be a new message that the user_list_item has not read
+                    // If you want to display data about the message or chat_list_item,
                     // Use the chatID and/or messageID and declare a new
-                    // SingleValueEventListener here, and add it to the chat/message DatabaseReference.
+                    // SingleValueEventListener here, and add it to the chat_list_item/message DatabaseReference.
                 }
 
                 @Override
@@ -74,7 +72,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     String messageID = dataSnapshot.getKey();
                     //TODO: Remove the notification
-                    // If the user reads the message in the app, before checking the notification
+                    // If the user_list_item reads the message in the app, before checking the notification
                     // then the notification is no longer relevant, remove it here.
                     // In onChildAdded you could use the messageID(s) to keep track of the notifications
                 }
@@ -111,27 +109,28 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item)
     {
 
-
-        if (item.getItemId() == R.id.menu_sign_out)
+//
+//        if (item.getItemId() == R.id.menu_sign_out)
+//        {
+//            AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>()
+//            {
+//                @Override
+//                public void onComplete(@NonNull Task<Void> task)
+//                {
+//                    Toast.makeText(MainActivity.this, "You have been signed out.", Toast.LENGTH_LONG).show();
+//
+//                    finish();
+//                }
+//            });
+//        }
+//        else
+            if (item.getItemId() == R.id.menu_user_list)
         {
-            AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>()
-            {
-                @Override
-                public void onComplete(@NonNull Task<Void> task)
-                {
-                    Toast.makeText(MainActivity.this, "You have been signed out.", Toast.LENGTH_LONG).show();
-
-                    finish();
-                }
-            });
-        }
-        else if (item.getItemId() == R.id.menu_user_list)
-        {
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, new ChatListFragment(ChatListFragment.TypeList.USERS)).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, new UserListFragment()).commit();
         }
         else if (item.getItemId() == R.id.menu_chats_list)
         {
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, new ChatListFragment(ChatListFragment.TypeList.CHATS)).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, new ChatListFragment()).commit();
         }
         return true;
     }
@@ -141,24 +140,24 @@ public class MainActivity extends AppCompatActivity
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == SIGN_IN_REQUEST_CODE)
-        {
-            if (resultCode == RESULT_OK)
-            {
-                Toast.makeText(this, "Successfully signed in. Welcome!", Toast.LENGTH_LONG).show();
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, new ChatListFragment(ChatListFragment.TypeList.CHATS)).commit();
-
-                FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).
-                        setValue(new User(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseAuth.getInstance().getCurrentUser().getEmail(), FirebaseAuth.getInstance().getCurrentUser().getUid()));
-
-            }
-            else
-            {
-                Toast.makeText(this, "We couldn't sign you in. Please try again later.", Toast.LENGTH_LONG).show();
-
-                finish();
-            }
-        }
+//        if (requestCode == SIGN_IN_REQUEST_CODE)
+//        {
+//            if (resultCode == RESULT_OK)
+//            {
+//                Toast.makeText(this, "Successfully signed in. Welcome!", Toast.LENGTH_LONG).show();
+//                getSupportFragmentManager().beginTransaction().replace(R.id.container, new UserListFragment(UserListFragment.TypeList.CHATS)).commit();
+//
+//                FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).
+//                        setValue(new User(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(), FirebaseAuth.getInstance().getCurrentUser().getUid()));
+//
+//            }
+//            else
+//            {
+//                Toast.makeText(this, "We couldn't sign you in. Please try again later.", Toast.LENGTH_LONG).show();
+//
+//                finish();
+//            }
+//        }
 
     }
 

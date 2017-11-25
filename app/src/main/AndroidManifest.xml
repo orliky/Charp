@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.yso.charp">
 
+    <uses-permission android:name="android.permission.READ_CONTACTS"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -18,14 +20,14 @@
         </service>
 
         <activity
-            android:name=".MainActivity">
+            android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".PhoneAuthActivity"
+        <activity android:name=".activity.PhoneAuthActivity"
                   android:theme="@style/AppTheme.NoActionBar"/>
 
         <activity android:name=".NewVersion.MainActivity1"
@@ -57,7 +59,7 @@
             android:theme="@style/Base.Theme.AppCompat" />
         <activity
             android:name=".NewVersion.UsersActivity"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".NewVersion.ProfileActivity"
                   android:theme="@style/AppTheme.NoActionBar">
@@ -68,7 +70,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".NewVersion.ChatActivity"
-                  android:parentActivityName=".MainActivity"
+                  android:parentActivityName=".activity.MainActivity"
                   android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 

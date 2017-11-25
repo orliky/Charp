@@ -1,4 +1,4 @@
-package com.yso.charp;
+package com.yso.charp.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,11 +9,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -25,8 +23,10 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.FirebaseDatabase;
+import com.yso.charp.R;
+import com.yso.charp.activity.MainActivity;
+import com.yso.charp.model.User;
 
 import java.util.concurrent.TimeUnit;
 
@@ -126,7 +126,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
                 //     verified without needing to send or enter a verification code.
                 // 2 - Auto-retrieval. On some devices Google Play services can automatically
                 //     detect the incoming verification SMS and perform verificaiton without
-                //     user action.
+                //     user_list_item action.
                 Log.d(TAG, "onVerificationCompleted:" + credential);
                 // [START_EXCLUDE silent]
                 mVerificationInProgress = false;
@@ -174,7 +174,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
             public void onCodeSent(String verificationId, PhoneAuthProvider.ForceResendingToken token)
             {
                 // The SMS verification code has been sent to the provided phone number, we
-                // now need to ask the user to enter the code and then construct a credential
+                // now need to ask the user_list_item to enter the code and then construct a credential
                 // by combining the code with a verification ID.
                 Log.d(TAG, "onCodeSent:" + verificationId);
 
@@ -196,7 +196,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
     public void onStart()
     {
         super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
+        // Check if user_list_item is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
         updateUI(currentUser);
 
@@ -267,7 +267,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
             {
                 if (task.isSuccessful())
                 {
-                    // Sign in success, update UI with the signed-in user's information
+                    // Sign in success, update UI with the signed-in user_list_item's information
                     Log.d(TAG, "signInWithCredential:success");
 
                     FirebaseUser user = task.getResult().getUser();
@@ -399,7 +399,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
 
             mTitleText.setText(user.getPhoneNumber());
             mStatusText.setText(R.string.signed_in);
-            if (user.getDisplayName().equals(""))
+            if (user.getDisplayName() == null ||user.getDisplayName().equals(""))
             {
                 mSendNameViews.setVisibility(View.VISIBLE);
                 mDetailText.setVisibility(View.GONE);
@@ -407,13 +407,8 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
             else
             {
                 mDetailText.setText(getString(R.string.firebase_status_fmt, user.getDisplayName()));
-
-                Toast.makeText(this, "Successfully signed in. Welcome!", Toast.LENGTH_LONG).show();
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, new ChatListFragment(ChatListFragment.TypeList.CHATS)).commit();
-
-                FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).
-                        setValue(new User(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseAuth.getInstance().getCurrentUser().getEmail(), FirebaseAuth.getInstance().getCurrentUser().getUid()));
-
+                FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()).
+                        setValue(new User(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(), FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
                 startActivity(new Intent(this, MainActivity.class));
                 finish();
@@ -481,8 +476,14 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
             case R.id.button_send_name:
                 if (!mNameField.getText().toString().equals(""))
                 {
-                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(mNameField.getText().toString()).build();
-                    mAuth.getCurrentUser().updateProfile(profileUpdates);
+//                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(mNameField.getText().toString()).build();
+//                    mAuth.getCurrentUser().updateProfile(profileUpdates);
+
+                    FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()).
+                            setValue(new User(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(), FirebaseAuth.getInstance().getCurrentUser().getUid()));
+
+                    startActivity(new Intent(this, MainActivity.class));
+                    finish();
                 }
                 break;
         }

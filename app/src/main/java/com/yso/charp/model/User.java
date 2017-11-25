@@ -1,6 +1,4 @@
-package com.yso.charp;
-
-import java.util.Date;
+package com.yso.charp.model;
 
 /**
  * Created by Admin on 19-Nov-17.
@@ -9,14 +7,14 @@ import java.util.Date;
 public class User
 {
     private String name;
-    private String email;
+    private String phone;
     private String created;
     private String signedIn;
     private String UID;
 
-    public User(String name, String email, String UID) {
+    public User(String name, String phone, String UID) {
         this.name = name;
-        this.email = email;
+        this.phone = phone;
         this.UID = UID;
     }
 
@@ -34,14 +32,14 @@ public class User
         this.name = name;
     }
 
-    public String getEmail()
+    public String getPhone()
     {
-        return email;
+        return phone;
     }
 
-    public void setEmail(String email)
+    public void setPhone(String phone)
     {
-        this.email = email;
+        this.phone = phone;
     }
 
     public String getCreated()

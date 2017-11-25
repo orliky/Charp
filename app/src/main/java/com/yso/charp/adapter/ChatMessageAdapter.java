@@ -1,4 +1,4 @@
-package com.yso.charp;
+package com.yso.charp.adapter;
 
 import android.annotation.SuppressLint;
 import android.support.v7.widget.RecyclerView;
@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,6 +16,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.yso.charp.R;
+import com.yso.charp.model.ChatMessage;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
     private List<ChatMessage> mMessageList;
 
-    ChatMessageAdapter(List<ChatMessage> mMessageList) {
+    public ChatMessageAdapter(List<ChatMessage> mMessageList) {
 
         this.mMessageList = mMessageList;
 

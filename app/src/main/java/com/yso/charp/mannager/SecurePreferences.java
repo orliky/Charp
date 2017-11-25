@@ -1,4 +1,4 @@
-package com.yso.charp;
+package com.yso.charp.mannager;
 
 /*
  Copyright (C) 2012 Sveinung Kval Bakken, sveinung.bakken@gmail.com
@@ -76,9 +76,9 @@ public class SecurePreferences
      * @param preferenceName name of preferences file (preferenceName.xml)
      * @param secureKey      the key used for encryption, finding a good key scheme is
      *                       hard. Hardcoding your key in the application is bad, but
-     *                       better than plaintext preferences. Having the user enter the
+     *                       better than plaintext preferences. Having the user_list_item enter the
      *                       key upon application launch is a safe(r) alternative, but
-     *                       annoying to the user.
+     *                       annoying to the user_list_item.
      * @param encryptKeys    settings this to false will only encrypt the values, true will
      *                       encrypt both values and keys. Keys can contain a lot of
      *                       information about the plaintext value of the value which can

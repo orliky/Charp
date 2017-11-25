@@ -1,4 +1,4 @@
-package com.yso.charp;
+package com.yso.charp.fragment;
 
 
 import android.os.Bundle;
@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseListAdapter;
@@ -24,8 +23,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.yso.charp.NewVersion.MessageAdapter;
-import com.yso.charp.NewVersion.Messages;
+import com.yso.charp.adapter.ChatMessageAdapter;
+import com.yso.charp.R;
+import com.yso.charp.model.ChatMessage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,13 +62,12 @@ public class ChatFragment extends Fragment {
 
         mRootRef = FirebaseDatabase.getInstance().getReference();
         mAuth = FirebaseAuth.getInstance();
-        mCurrentUserId = mAuth.getCurrentUser().getUid();
+        mCurrentUserId = mAuth.getCurrentUser().getPhoneNumber();
 
         Bundle bundle = this.getArguments();
 
         if (bundle != null) {
-            chatWith = bundle.getString("chat_with");
-            mChatUser = bundle.getString("user_id");
+            mChatUser = bundle.getString("user_phone");
         }
 
         listOfMessages = (RecyclerView) view.findViewById(R.id.list_of_messages);
@@ -137,14 +136,15 @@ public class ChatFragment extends Fragment {
     }
 
     private void loadMessages() {
-        mRootRef.child("messages").child(mCurrentUserId).child(mChatUser).addChildEventListener(new ChildEventListener() {
+        mRootRef.child("Messages").child(mCurrentUserId).child(mChatUser).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (!dataSnapshot.getKey().equals("lastMessage")) {
+                    ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
 
-                ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
-
-                messagesList.add(chatMessage);
-                mAdapter.notifyDataSetChanged();
+                    messagesList.add(chatMessage);
+                    mAdapter.notifyDataSetChanged();
+                }
 
             }
 
@@ -178,10 +178,10 @@ public class ChatFragment extends Fragment {
 
         if (!TextUtils.isEmpty(message)) {
 
-            String current_user_ref = "messages/" + mCurrentUserId + "/" + mChatUser;
-            String chat_user_ref = "messages/" + mChatUser + "/" + mCurrentUserId;
+            String current_user_ref = "Messages/" + mCurrentUserId + "/" + mChatUser;
+            String chat_user_ref = "Messages/" + mChatUser + "/" + mCurrentUserId;
 
-            DatabaseReference user_message_push = mRootRef.child("messages")
+            DatabaseReference user_message_push = mRootRef.child("Messages")
                     .child(mCurrentUserId).child(mChatUser).push();
 
             String push_id = user_message_push.getKey();
@@ -195,7 +195,9 @@ public class ChatFragment extends Fragment {
             ChatMessage messageMap = new ChatMessage(input.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
             Map messageUserMap = new HashMap();
             messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
+            messageUserMap.put(current_user_ref + "/" + "lastMessage", messageMap);
             messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+            messageUserMap.put(chat_user_ref + "/" + "lastMessage", messageMap);
 
             input.setText("");
 
