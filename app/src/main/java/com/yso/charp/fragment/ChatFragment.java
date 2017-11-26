@@ -153,6 +153,8 @@ public class ChatFragment extends Fragment {
 
                     messagesList.add(chatMessage);
                     mAdapter.notifyDataSetChanged();
+
+                    listOfMessages.scrollToPosition(mAdapter.getItemCount() - 1);
                 }
 
             }
@@ -217,6 +219,7 @@ public class ChatFragment extends Fragment {
                         return;
                     }
                     sendNotificationToUser(mChatUser, message);
+                    listOfMessages.scrollToPosition(mAdapter.getItemCount() - 1);
                 }
             });
         }
@@ -230,7 +233,7 @@ public class ChatFragment extends Fragment {
                     user.getPhone(),
                     mAuth.getCurrentUser().getPhoneNumber(),
                     message,
-                    "new_notification"
+                    "chat_view"
             );
         }
     }

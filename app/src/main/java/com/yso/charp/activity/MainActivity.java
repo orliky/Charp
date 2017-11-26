@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity
         }
         else
         {
-            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+//            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
             // User is already signed in. Therefore, display
             // a welcome Toast

@@ -158,7 +158,7 @@ public class FirebaseNotificationService extends Service {
 
     private void flagNotificationAsSent(String notification_key) {
         mDatabase.getReference().child("notifications")
-                .child(firebaseAuth.getCurrentUser().getUid())
+                .child(firebaseAuth.getCurrentUser().getPhoneNumber())
                 .child(notification_key)
                 .child("status")
                 .setValue(1);
