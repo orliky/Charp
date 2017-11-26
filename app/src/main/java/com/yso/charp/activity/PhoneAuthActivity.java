@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.FirebaseDatabase;
 import com.yso.charp.R;
 import com.yso.charp.activity.MainActivity;
@@ -476,8 +477,8 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
             case R.id.button_send_name:
                 if (!mNameField.getText().toString().equals(""))
                 {
-//                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(mNameField.getText().toString()).build();
-//                    mAuth.getCurrentUser().updateProfile(profileUpdates);
+                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(mNameField.getText().toString()).build();
+                    mAuth.getCurrentUser().updateProfile(profileUpdates);
 
                     FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()).
                             setValue(new User(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(), FirebaseAuth.getInstance().getCurrentUser().getUid()));

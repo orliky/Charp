@@ -61,7 +61,7 @@ public class FirebaseNotificationService extends Service {
     private void setupNotificationListener() {
 
         mDatabase.getReference().child("notifications")
-                .child(firebaseAuth.getCurrentUser().getUid())
+                .child(firebaseAuth.getCurrentUser().getPhoneNumber())
                 .orderByChild("status").equalTo(0)
                 .addChildEventListener(new ChildEventListener() {
             @Override
