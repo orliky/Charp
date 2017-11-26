@@ -164,7 +164,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
                     // [END_EXCLUDE]
                 }
 
-                // Show a message and update the UI
+                // Show a message_list_item and update the UI
                 // [START_EXCLUDE]
                 updateUI(STATE_VERIFY_FAILED);
                 // [END_EXCLUDE]
@@ -277,7 +277,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
                 }
                 else
                 {
-                    // Sign in failed, display a message and update the UI
+                    // Sign in failed, display a message_list_item and update the UI
                     Log.w(TAG, "signInWithCredential:failure", task.getException());
                     if (task.getException() instanceof FirebaseAuthInvalidCredentialsException)
                     {

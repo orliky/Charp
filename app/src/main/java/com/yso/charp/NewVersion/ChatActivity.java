@@ -243,7 +243,7 @@ public class ChatActivity extends AppCompatActivity
             String push_id = user_message_push.getKey();
 
             Map messageMap = new HashMap();
-            messageMap.put("message", message);
+            messageMap.put("message_list_item", message);
             messageMap.put("seen", false);
             messageMap.put("type", "text");
             messageMap.put("time", ServerValue.TIMESTAMP);

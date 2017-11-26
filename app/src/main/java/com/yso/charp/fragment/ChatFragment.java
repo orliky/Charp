@@ -71,7 +71,7 @@ public class ChatFragment extends Fragment {
         }
 
         listOfMessages = (RecyclerView) view.findViewById(R.id.list_of_messages);
-        mAdapter = new ChatMessageAdapter(messagesList);
+        mAdapter = new ChatMessageAdapter(getContext(), messagesList);
         mLinearLayout = new LinearLayoutManager(getActivity());
 
         listOfMessages.setHasFixedSize(true);
@@ -106,10 +106,10 @@ public class ChatFragment extends Fragment {
 
     private void displayChatMessages() {
         if (chatWith != null) {
-            adapter = new FirebaseListAdapter<ChatMessage>(getActivity(), ChatMessage.class, R.layout.message, FirebaseDatabase.getInstance().getReference().child("Users").child(chatWith).child("Chat")) {
+            adapter = new FirebaseListAdapter<ChatMessage>(getActivity(), ChatMessage.class, R.layout.message_list_item, FirebaseDatabase.getInstance().getReference().child("Users").child(chatWith).child("Chat")) {
                 @Override
                 protected void populateView(View v, ChatMessage model, int position) {
-                    // Get references to the views of message.xml
+                    // Get references to the views of message_list_item.xmlt_item.xml
                     TextView messageText = v.findViewById(R.id.message_text);
                     TextView messageUser = v.findViewById(R.id.message_from_user);
                     TextView messageTime = v.findViewById(R.id.message_time);
@@ -187,12 +187,12 @@ public class ChatFragment extends Fragment {
             String push_id = user_message_push.getKey();
 
 //            Map messageMap = new HashMap();
-//            messageMap.put("message", message);
+//            messageMap.put("message_list_item", message_list_item);
 //            messageMap.put("seen", false);
 //            messageMap.put("type", "text");
 //            messageMap.put("time", ServerValue.TIMESTAMP);
 //            messageMap.put("from", mCurrentUserId);
-            ChatMessage messageMap = new ChatMessage(input.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+            ChatMessage messageMap = new ChatMessage(input.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber());
             Map messageUserMap = new HashMap();
             messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
             messageUserMap.put(current_user_ref + "/" + "lastMessage", messageMap);

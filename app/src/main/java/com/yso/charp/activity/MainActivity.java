@@ -1,20 +1,38 @@
 package com.yso.charp.activity;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.yso.charp.fragment.ChatFragment;
 import com.yso.charp.fragment.ChatListFragment;
+import com.yso.charp.fragment.SectionsPagerAdapter;
 import com.yso.charp.fragment.UserListFragment;
 import com.yso.charp.R;
 
@@ -24,13 +42,39 @@ public class MainActivity extends AppCompatActivity
 
     private static int SIGN_IN_REQUEST_CODE = 9981;
 
+    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 1;
+    private static String[] PERMISSIONS_CONTACT = {Manifest.permission.READ_CONTACTS};
 
+    private TabLayout mTabLayout;
+    private ViewPager mViewPager;
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private FrameLayout mContainer;
+    private AppBarLayout mAppBarLayout;
+
+    @RequiresApi (api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        checkPernission();
+    }
+
+    @RequiresApi (api = Build.VERSION_CODES.M)
+    private void checkPernission()
+    {
+        if (checkSelfPermission(PERMISSIONS_CONTACT[0]) > PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG,"Contact permissions have already been granted. Displaying contact details.");
+            init();
+        } else {
+            Log.i(TAG, "Contact permissions has NOT been granted. Requesting permission.");
+            requestPermissions(PERMISSIONS_CONTACT, PERMISSIONS_REQUEST_READ_CONTACTS);
+        }
+    }
+
+    private void init()
+    {
         if (FirebaseAuth.getInstance().getCurrentUser() == null)
         {
             // Start sign in/sign up activity
@@ -46,7 +90,7 @@ public class MainActivity extends AppCompatActivity
             // a welcome Toast
             Toast.makeText(this, "Welcome " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), Toast.LENGTH_LONG).show();
 
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, new ChatListFragment()).commit();
+//            getSupportFragmentManager().beginTransaction().replace(R.id.container, new ChatListFragment()).commit();
 
 
             /*//            chatID = FirebaseDatabase.getInstance().getReference().child().push().getKey();
@@ -61,10 +105,10 @@ public class MainActivity extends AppCompatActivity
                     String messageID = dataSnapshot.getKey();
                     setNotification(messageID);
                     //TODO: Handle Notification here, using the messageID
-                    // A datasnapshot received here will be a new message that the user_list_item has not read
-                    // If you want to display data about the message or chat_list_item,
+                    // A datasnapshot received here will be a new message_list_item that the user_list_item has not read
+                    // If you want to display data about the message_list_item or chat_list_item,
                     // Use the chatID and/or messageID and declare a new
-                    // SingleValueEventListener here, and add it to the chat_list_item/message DatabaseReference.
+                    // SingleValueEventListener here, and add it to the chat_list_item/message_list_item DatabaseReference.
                 }
 
                 @Override
@@ -72,7 +116,7 @@ public class MainActivity extends AppCompatActivity
                 {
                     String messageID = dataSnapshot.getKey();
                     //TODO: Remove the notification
-                    // If the user_list_item reads the message in the app, before checking the notification
+                    // If the user_list_item reads the message_list_item in the app, before checking the notification
                     // then the notification is no longer relevant, remove it here.
                     // In onChildAdded you could use the messageID(s) to keep track of the notifications
                 }
@@ -96,6 +140,16 @@ public class MainActivity extends AppCompatActivity
                 }
             });*/
         }
+        mContainer = (FrameLayout) findViewById(R.id.container);
+        mAppBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
+        //Tabs
+        mViewPager = (ViewPager) findViewById(R.id.main_tabPager);
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
+        mTabLayout.setupWithViewPager(mViewPager);
     }
 
     @Override
@@ -109,29 +163,28 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item)
     {
 
-//
-//        if (item.getItemId() == R.id.menu_sign_out)
-//        {
-//            AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>()
-//            {
-//                @Override
-//                public void onComplete(@NonNull Task<Void> task)
-//                {
-//                    Toast.makeText(MainActivity.this, "You have been signed out.", Toast.LENGTH_LONG).show();
-//
-//                    finish();
-//                }
-//            });
-//        }
+        if (item.getItemId() == R.id.menu_sign_out)
+        {
+            AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>()
+            {
+                @Override
+                public void onComplete(@NonNull Task<Void> task)
+                {
+                    Toast.makeText(MainActivity.this, "You have been signed out.", Toast.LENGTH_LONG).show();
+
+                    finish();
+                }
+            });
+        }
 //        else
-            if (item.getItemId() == R.id.menu_user_list)
+         /*   if (item.getItemId() == R.id.menu_user_list)
         {
             getSupportFragmentManager().beginTransaction().replace(R.id.container, new UserListFragment()).commit();
         }
         else if (item.getItemId() == R.id.menu_chats_list)
         {
             getSupportFragmentManager().beginTransaction().replace(R.id.container, new ChatListFragment()).commit();
-        }
+        }*/
         return true;
     }
 
@@ -159,6 +212,52 @@ public class MainActivity extends AppCompatActivity
 //            }
 //        }
 
+    }
+
+    @RequiresApi (api = Build.VERSION_CODES.M)
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_READ_CONTACTS: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay! do the
+                    // calendar task you need to do.
+                    Log.d(TAG, "permission granted");
+                    init();
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Log.d(TAG, "permission denied");
+                    Toast.makeText(this, "You mast approve it", Toast.LENGTH_LONG).show();
+                    checkPernission();
+                }
+                return;
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        if (mContainer.getVisibility() == View.GONE)
+        {
+            super.onBackPressed();
+        }
+        else
+        {
+            mContainer.setVisibility(View.GONE);
+            mAppBarLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void addChatFragment(Bundle bundle)
+    {
+        mAppBarLayout.setVisibility(View.GONE);
+        mContainer.setVisibility(View.VISIBLE);
+        ChatFragment chatFragment = new ChatFragment();
+        chatFragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction().replace(R.id.container, chatFragment).commit();
+//        setTitle("Chat");
     }
 
     public void setNotification(String message)

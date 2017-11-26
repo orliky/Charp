@@ -1,12 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!--<item-->
-        <!--android:id="@+id/menu_sign_out"-->
-        <!--android:title="Sign out"-->
-        <!--app:showAsAction="never"/>-->
-
     <item
+        android:id="@+id/menu_sign_out"
+        android:title="Sign out"
+        app:showAsAction="never"/>
+
+   <!-- <item
         android:id="@+id/menu_user_list"
         android:title="Users"
         app:showAsAction="never"/>
@@ -14,6 +14,6 @@
     <item
         android:id="@+id/menu_chats_list"
         android:title="Chats"
-        app:showAsAction="never"/>
+        app:showAsAction="never"/>-->
 
 </menu>

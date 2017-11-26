@@ -7,8 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.yso.charp.Interface.ChatItemClickListener;
 import com.yso.charp.R;
 import com.yso.charp.model.User;
+import com.yso.charp.utils.Utils;
 
 import java.util.HashMap;
 
@@ -16,26 +18,32 @@ import java.util.HashMap;
  * Created by Admin on 21-Nov-17.
  */
 
-public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+{
     private HashMap<String, User> mData = new HashMap<>();
     private String[] mKeys;
     private LayoutInflater mInflater;
-    private ItemClickListener mClickListener;
+    private ChatItemClickListener mClickListener;
+    private Context mContext;
 
-    public UserListAdapter(Context context, HashMap<String, User> data) {
+    public UserListAdapter(Context context, HashMap<String, User> data)
+    {
+        this.mContext = context;
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
         mKeys = mData.keySet().toArray(new String[data.size()]);
     }
 
-    public void setItems(HashMap<String, User> data) {
+    public void setItems(HashMap<String, User> data)
+    {
         mData = data;
         mKeys = mData.keySet().toArray(new String[data.size()]);
         notifyDataSetChanged();
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    {
 
         View userView = mInflater.inflate(R.layout.user_list_item, parent, false);
         UserViewHolder userViewHolder = new UserViewHolder(userView);
@@ -43,29 +51,36 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
     @Override
-    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position)
+    {
         User user = (User) getItem(position);
 
         UserViewHolder userViewHolder = (UserViewHolder) holder;
         userViewHolder.mName.setText(user.getName());
-        userViewHolder.mPhone.setText(user.getPhone());
+        String contactName =  Utils.getContactName(user.getPhone(), mContext);
+        String name = contactName.equals("") ? user.getPhone() : contactName;
+        userViewHolder.mPhone.setText(name);
 
     }
 
     @Override
-    public int getItemCount() {
+    public int getItemCount()
+    {
         return mData.size();
     }
 
-    public Object getItem(int position) {
+    public Object getItem(int position)
+    {
         return mData.get(mKeys[position]);
     }
 
-    public class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
+    {
         public TextView mName;
         public TextView mPhone;
 
-        public UserViewHolder(View itemView) {
+        public UserViewHolder(View itemView)
+        {
             super(itemView);
             mName = (TextView) itemView.findViewById(R.id.user_name);
             mPhone = (TextView) itemView.findViewById(R.id.user_phone);
@@ -73,18 +88,17 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
 
         @Override
-        public void onClick(View view) {
-            if (mClickListener != null) {
+        public void onClick(View view)
+        {
+            if (mClickListener != null)
+            {
                 mClickListener.onItemClick(mKeys[getAdapterPosition()]);
             }
         }
     }
 
-    public void setClickListener(ItemClickListener itemClickListener) {
+    public void setClickListener(ChatItemClickListener itemClickListener)
+    {
         this.mClickListener = itemClickListener;
-    }
-
-    public interface ItemClickListener {
-        void onItemClick(String key);
     }
 }

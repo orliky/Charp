@@ -17,6 +17,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.yso.charp.Interface.ChatItemClickListener;
+import com.yso.charp.activity.MainActivity;
 import com.yso.charp.adapter.UserListAdapter;
 import com.yso.charp.R;
 import com.yso.charp.model.User;
@@ -28,7 +30,8 @@ import java.util.HashMap;
  * A simple {@link Fragment} subclass.
  */
 @SuppressLint("ValidFragment")
-public class UserListFragment extends Fragment implements UserListAdapter.ItemClickListener {
+public class UserListFragment extends Fragment implements ChatItemClickListener
+{
 
     private RecyclerView listOfUsers;
     private HashMap<String, User> userList = new HashMap<>();
@@ -92,8 +95,6 @@ public class UserListFragment extends Fragment implements UserListAdapter.ItemCl
         Bundle bundle = new Bundle();
         bundle.putString("user_phone", key);
 
-        ChatFragment chatFragment = new ChatFragment();
-        chatFragment.setArguments(bundle);
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, chatFragment).commit();
+        ((MainActivity) getActivity()).addChatFragment(bundle);
     }
 }

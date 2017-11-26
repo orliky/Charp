@@ -1,6 +1,7 @@
 package com.yso.charp.adapter;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.view.Gravity;
@@ -11,13 +12,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.yso.charp.R;
 import com.yso.charp.model.ChatMessage;
+import com.yso.charp.utils.Utils;
 
 import java.util.List;
 
@@ -25,18 +22,19 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
 
     private List<ChatMessage> mMessageList;
+    private Context mContext;
 
-    public ChatMessageAdapter(List<ChatMessage> mMessageList) {
+    public ChatMessageAdapter(Context context, List<ChatMessage> mMessageList) {
 
+        this.mContext = context;
         this.mMessageList = mMessageList;
-
     }
 
     @Override
     public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.message, parent, false);
+                .inflate(R.layout.message_list_item, parent, false);
 
         return new MessageViewHolder(v);
 
@@ -68,7 +66,9 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
         setGtavityByUser(viewHolder, c);
 
-        viewHolder.displayName.setText(c.getMessageUser());
+        String contactName =  Utils.getContactName(c.getMessageUser(), mContext);
+        String name = contactName.equals("") ? c.getMessageUser() : contactName;
+        viewHolder.displayName.setText(name);
         viewHolder.messageText.setText(c.getMessageText());
         viewHolder.messageTime.setText(DateFormat.format("h:mm a", c.getMessageTime()));
     }
@@ -77,7 +77,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-        if (c.getMessageUser().equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
+        if (c.getMessageUser().equals(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())) {
             layoutParams.gravity = Gravity.START;
             viewHolder.group.setLayoutParams(layoutParams);
             viewHolder.group.setBackgroundResource(R.drawable.my_bubble);
