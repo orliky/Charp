@@ -55,24 +55,6 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         chatViewHolder.mName.setText(chatTitle.getPhone());
         chatViewHolder.mLastMessage.setText(chatTitle.getLastMessage());
-
-//        chatViewHolder.mName.setText(mKeys[position]);
-
-//        Map userMessagesMap = (Map) getItem(position);
-//
-//        List<Map.Entry<String,Integer>> entryList = new ArrayList<Map.Entry<String, Integer>>(userMessagesMap.entrySet());
-//        Map.Entry<String, Integer> userMessagesEntry = entryList.get(entryList.size()-1);
-//
-////        Map.Entry<String, String> userMessagesEntry = (Map.Entry<String, String>) userMessagesMap.entrySet().iterator().next();
-//
-//        Map messagesMap = (Map) userMessagesMap.get(userMessagesEntry.getKey());
-////        Map.Entry<String,String> messagesEntry = (Map.Entry<String, String>) messagesMap.entrySet().iterator().next();
-//
-//        setMessage(chatViewHolder, messagesMap);
-//
-////        Map messageMap = (Map) messagesMap.get(messagesEntry.getKey());
-////        Map.Entry<String,String> messageEntry = (Map.Entry<String, String>) messageMap.entrySet().iterator().next();
-
     }
 
     @Override

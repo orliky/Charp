@@ -65,44 +65,29 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     public void onBindViewHolder(final MessageViewHolder viewHolder, int i) {
 
         ChatMessage c = mMessageList.get(i);
-        String from_user = c.getMessageUser();
 
-        DatabaseReference userDatabase = FirebaseDatabase.getInstance().getReference().child("Users").child(from_user);
+        setGtavityByUser(viewHolder, c);
 
-        userDatabase.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                String name = dataSnapshot.getKey();
-                if(viewHolder.displayName.getVisibility() == View.VISIBLE) {
-                    viewHolder.displayName.setText(name);
-                }
-
-                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-                if (name.equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
-                    layoutParams.gravity = Gravity.START;
-                    viewHolder.group.setLayoutParams(layoutParams);
-                    viewHolder.group.setBackgroundResource(R.drawable.bubble_right_green);
-                    layoutParams.setMarginEnd(150);
-                } else {
-                    layoutParams.gravity = Gravity.END;
-                    viewHolder.group.setLayoutParams(layoutParams);
-                    viewHolder.group.setBackgroundResource(R.drawable.bubble_left_gray);
-                    layoutParams.setMarginStart(150);
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
+        viewHolder.displayName.setText(c.getMessageUser());
         viewHolder.messageText.setText(c.getMessageText());
         viewHolder.messageTime.setText(DateFormat.format("h:mm a", c.getMessageTime()));
+    }
+
+    private void setGtavityByUser(MessageViewHolder viewHolder, ChatMessage c) {
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        if (c.getMessageUser().equals(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())) {
+            layoutParams.gravity = Gravity.START;
+            viewHolder.group.setLayoutParams(layoutParams);
+            viewHolder.group.setBackgroundResource(R.drawable.my_bubble);
+            layoutParams.setMarginEnd(150);
+        } else {
+            layoutParams.gravity = Gravity.END;
+            viewHolder.group.setLayoutParams(layoutParams);
+            viewHolder.group.setBackgroundResource(R.drawable.other_bubble);
+            layoutParams.setMarginStart(150);
+        }
     }
 
     @Override
