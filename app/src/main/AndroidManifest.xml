@@ -11,13 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name="android.support.multidex.MultiDexApplication">
-
-        <service android:name=".NewVersion.FirebaseMessagingService">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
+        android:name=".MyApplication">
 
         <activity
             android:name=".activity.MainActivity">
@@ -26,9 +20,30 @@
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <intent-filter>
+                <action android:name="charp_TARGET_NOTIFICATION" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
         <activity android:name=".activity.PhoneAuthActivity"
                   android:theme="@style/AppTheme.NoActionBar"/>
+
+        <receiver
+            android:name="receiver.OnBootReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".service.FirebaseNotificationService"/>
+
+
+
+
 
         <activity android:name=".NewVersion.MainActivity1"
                   android:theme="@style/AppTheme.NoActionBar">
@@ -63,7 +78,7 @@
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity android:name=".NewVersion.ProfileActivity"
                   android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
+           <intent-filter>
                 <action android:name="in.tvac.akshaye.lapitchat_TARGET_NOTIFICATION" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -72,6 +87,11 @@
         <activity android:name=".NewVersion.ChatActivity"
                   android:parentActivityName=".activity.MainActivity"
                   android:theme="@style/AppTheme.NoActionBar"/>
+        <service android:name=".NewVersion.FirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

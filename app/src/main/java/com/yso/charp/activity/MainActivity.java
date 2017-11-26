@@ -13,8 +13,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
@@ -31,10 +29,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.yso.charp.fragment.ChatFragment;
-import com.yso.charp.fragment.ChatListFragment;
 import com.yso.charp.fragment.SectionsPagerAdapter;
-import com.yso.charp.fragment.UserListFragment;
 import com.yso.charp.R;
+import com.yso.charp.service.FirebaseNotificationService;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -90,7 +87,7 @@ public class MainActivity extends AppCompatActivity
             // a welcome Toast
             Toast.makeText(this, "Welcome " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), Toast.LENGTH_LONG).show();
 
-//            getSupportFragmentManager().beginTransaction().replace(R.id.container, new ChatListFragment()).commit();
+            //            getSupportFragmentManager().beginTransaction().replace(R.id.container, new ChatListFragment()).commit();
 
 
             /*//            chatID = FirebaseDatabase.getInstance().getReference().child().push().getKey();
@@ -139,17 +136,19 @@ public class MainActivity extends AppCompatActivity
 
                 }
             });*/
+            mContainer = (FrameLayout) findViewById(R.id.container);
+            mAppBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
+            //Tabs
+            mViewPager = (ViewPager) findViewById(R.id.main_tabPager);
+            mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+
+            mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
+            mTabLayout.setupWithViewPager(mViewPager);
+
+            startService(new Intent(this, FirebaseNotificationService.class));
         }
-        mContainer = (FrameLayout) findViewById(R.id.container);
-        mAppBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
-        //Tabs
-        mViewPager = (ViewPager) findViewById(R.id.main_tabPager);
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-
-        mTabLayout = (TabLayout) findViewById(R.id.main_tabs);
-        mTabLayout.setupWithViewPager(mViewPager);
     }
 
     @Override

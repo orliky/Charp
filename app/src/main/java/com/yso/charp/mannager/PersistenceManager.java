@@ -4,6 +4,12 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.yso.charp.model.User;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class PersistenceManager
 {
@@ -11,6 +17,7 @@ public class PersistenceManager
     private static final String LOG_TAG = PersistenceManager.class.getSimpleName();
 
     private static final String PREF_LOGGED_IN = "pref.LOGGED_IN";
+    private static final String PREF_ARRAY_LIST = "pref.ARRAY_LIST";
 
     private static PersistenceManager msInstance;
     private Gson mGson;
@@ -47,5 +54,19 @@ public class PersistenceManager
     public boolean isLoggedIn()
     {
         return SecurePreferences.getInstance().getBoolean(PREF_LOGGED_IN, false);
+    }
+
+    public void setUsersMap(HashMap<String, User> hashMap)
+    {
+        SecurePreferences.getInstance().setString(PREF_ARRAY_LIST, mGson.toJson(hashMap));
+    }
+
+    public HashMap<String, User> getUsersMap()
+    {
+        String branchMapDataString = SecurePreferences.getInstance().getString(PREF_ARRAY_LIST, mGson.toJson(new ArrayList<>()));
+        Type listType = new TypeToken<HashMap<String, User>>()
+        {}.getType();
+
+        return mGson.fromJson(branchMapDataString, listType);
     }
 }

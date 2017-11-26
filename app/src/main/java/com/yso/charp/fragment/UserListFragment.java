@@ -21,6 +21,7 @@ import com.yso.charp.Interface.ChatItemClickListener;
 import com.yso.charp.activity.MainActivity;
 import com.yso.charp.adapter.UserListAdapter;
 import com.yso.charp.R;
+import com.yso.charp.mannager.PersistenceManager;
 import com.yso.charp.model.User;
 
 import java.util.HashMap;
@@ -80,6 +81,7 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
                         userList.put(user.getPhone(), user);
                     }
                 }
+                PersistenceManager.getInstance().setUsersMap(userList);
                 mAdapter.setItems(userList);
             }
 
