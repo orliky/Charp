@@ -1,16 +1,12 @@
 package com.yso.charp.fragment;
 
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.NotificationCompat;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -29,7 +25,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.yso.charp.activity.MainActivity;
 import com.yso.charp.adapter.ChatMessageAdapter;
 import com.yso.charp.R;
 import com.yso.charp.mannager.PersistenceManager;
@@ -46,9 +41,10 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ChatFragment extends Fragment {
+public class ChatFragment extends Fragment
+{
     private FirebaseListAdapter<ChatMessage> adapter;
-    private RecyclerView listOfMessages;
+    private RecyclerView mRecyclerView;
     private String chatWith;
     private EditText input;
     private String mCurrentUserId, mChatUser;
@@ -57,13 +53,17 @@ public class ChatFragment extends Fragment {
     private final List<ChatMessage> messagesList = new ArrayList<>();
     private LinearLayoutManager mLinearLayout;
     private ChatMessageAdapter mAdapter;
+    private boolean mIsBottom = true;
 
-    public ChatFragment() {
+    public ChatFragment()
+    {
 
     }
 
+    @SuppressLint ("NewApi")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
@@ -75,119 +75,96 @@ public class ChatFragment extends Fragment {
 
         Bundle bundle = this.getArguments();
 
-        if (bundle != null) {
+        if (bundle != null)
+        {
             mChatUser = bundle.getString("user_phone");
         }
 
-        listOfMessages = (RecyclerView) view.findViewById(R.id.list_of_messages);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.list_of_messages);
+
         mAdapter = new ChatMessageAdapter(getContext(), messagesList);
         mLinearLayout = new LinearLayoutManager(getActivity());
+        mLinearLayout.setStackFromEnd(true);
 
-        listOfMessages.setHasFixedSize(true);
-        listOfMessages.setLayoutManager(mLinearLayout);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(mLinearLayout);
 
-        listOfMessages.setAdapter(mAdapter);
-        //        displayChatMessages();
+        mRecyclerView.setAdapter(mAdapter);
+
         loadMessages();
 
         return view;
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
         super.onViewCreated(view, savedInstanceState);
 
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View view) {
-                // Read the input field and push a new instance
-                // of ChatMessage to the Firebase database
-                //                FirebaseDatabase.getInstance().getReference().child("Users").child(chatWith).child("Chat").push()
-                //                        .setValue(new ChatMessage(input.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getDisplayName()));
+            public void onClick(View view)
+            {
                 sendMessage();
-                // Clear the input
                 input.setText("");
             }
         });
     }
 
-    private void displayChatMessages() {
-        if (chatWith != null) {
-            adapter = new FirebaseListAdapter<ChatMessage>(getActivity(), ChatMessage.class, R.layout.message_list_item, FirebaseDatabase.getInstance().getReference().child("Users").child(chatWith).child("Chat")) {
-                @Override
-                protected void populateView(View v, ChatMessage model, int position) {
-                    // Get references to the views of message_list_item.xmlt_item.xml
-                    TextView messageText = v.findViewById(R.id.message_text);
-                    TextView messageUser = v.findViewById(R.id.message_from_user);
-                    TextView messageTime = v.findViewById(R.id.message_time);
-
-                    // Set their text
-                    messageText.setText(model.getMessageText());
-                    messageUser.setText(model.getMessageUser());
-
-                    // Format the date before showing it
-                    messageTime.setText(DateFormat.format("dd-MM-yyyy (HH:mm:ss)", model.getMessageTime()));
-
-                }
-
-                @Override
-                protected void onDataChanged() {
-                    super.onDataChanged();
-                    //                    listOfMessages.setSelection(adapter.getCount() - 1);
-                }
-            };
-
-            //            listOfMessages.setAdapter(adapter);
-            //            listOfMessages.setSelection(adapter.getCount() - 1);
-        }
-    }
-
-    private void loadMessages() {
-        mRootRef.child("Messages").child(mCurrentUserId).child(mChatUser).addChildEventListener(new ChildEventListener() {
+    private void loadMessages()
+    {
+        mRootRef.child("Messages").child(mCurrentUserId).child(mChatUser).addChildEventListener(new ChildEventListener()
+        {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                if (!dataSnapshot.getKey().equals("lastMessage")) {
+            public void onChildAdded(DataSnapshot dataSnapshot, String s)
+            {
+                if (!dataSnapshot.getKey().equals("lastMessage"))
+                {
                     ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
 
                     messagesList.add(chatMessage);
                     mAdapter.notifyDataSetChanged();
 
-                    listOfMessages.scrollToPosition(mAdapter.getItemCount() - 1);
+                    mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
                 }
 
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            public void onChildChanged(DataSnapshot dataSnapshot, String s)
+            {
 
             }
 
             @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            public void onChildRemoved(DataSnapshot dataSnapshot)
+            {
 
             }
 
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            public void onChildMoved(DataSnapshot dataSnapshot, String s)
+            {
 
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(DatabaseError databaseError)
+            {
 
             }
         });
 
     }
 
-    private void sendMessage() {
-
-
+    private void sendMessage()
+    {
         final String message = input.getText().toString();
-
-        if (!TextUtils.isEmpty(message)) {
+        if (!TextUtils.isEmpty(message) && message.trim().length() > 0)
+        {
 
             String current_user_ref = "Messages/" + mCurrentUserId + "/" + mChatUser;
             String chat_user_ref = "Messages/" + mChatUser + "/" + mCurrentUserId;
@@ -211,30 +188,30 @@ public class ChatFragment extends Fragment {
 
             input.setText("");
 
-            mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
+            mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener()
+            {
                 @Override
-                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                    if (databaseError != null) {
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
+                {
+                    if (databaseError != null)
+                    {
                         Log.d("CHAT_LOG", databaseError.getMessage().toString());
                         return;
                     }
                     sendNotificationToUser(mChatUser, message);
-                    listOfMessages.scrollToPosition(mAdapter.getItemCount() - 1);
+                    mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
                 }
             });
         }
     }
 
-    private void sendNotificationToUser(String userPhone, String message) {
+    private void sendNotificationToUser(String userPhone, String message)
+    {
         HashMap users = PersistenceManager.getInstance().getUsersMap();
         User user = (User) users.get(userPhone);
-        if (!user.getPhone().equals(mAuth.getCurrentUser().getPhoneNumber())) {
-            Utils.sendNotification(getActivity(),
-                    user.getPhone(),
-                    mAuth.getCurrentUser().getPhoneNumber(),
-                    message,
-                    "chat_view"
-            );
+        if (!user.getPhone().equals(mAuth.getCurrentUser().getPhoneNumber()))
+        {
+            Utils.sendNotification(getActivity(), user.getPhone(), mAuth.getCurrentUser().getPhoneNumber(), message, "chat_view");
         }
     }
 }

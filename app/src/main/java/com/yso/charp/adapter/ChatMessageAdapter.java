@@ -70,7 +70,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         String name = contactName.equals("") ? c.getMessageUser() : contactName;
         viewHolder.displayName.setText(name);
         viewHolder.messageText.setText(c.getMessageText());
-        viewHolder.messageTime.setText(DateFormat.format("h:mm a", c.getMessageTime()));
+        viewHolder.messageTime.setText(DateFormat.format("HH:mm", c.getMessageTime()));
     }
 
     private void setGtavityByUser(MessageViewHolder viewHolder, ChatMessage c) {
@@ -94,6 +94,4 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     public int getItemCount() {
         return mMessageList.size();
     }
-
-
 }
