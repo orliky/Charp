@@ -30,54 +30,65 @@ import java.util.HashMap;
 /**
  * A simple {@link Fragment} subclass.
  */
-@SuppressLint("ValidFragment")
+@SuppressLint ("ValidFragment")
 public class UserListFragment extends Fragment implements ChatItemClickListener
 {
 
-    private RecyclerView listOfUsers;
+    private RecyclerView mRecyclerView;
     private HashMap<String, User> userList = new HashMap<>();
     private UserListAdapter mAdapter;
 
 
-    public UserListFragment() {
+    public UserListFragment()
+    {
     }
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         return inflater.inflate(R.layout.fragment_user_list, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
         super.onViewCreated(view, savedInstanceState);
+
+        userList = PersistenceManager.getInstance().getUsersMap();
 
         initAdapter(view);
 
         mAdapter.setClickListener(this);
-        listOfUsers.setLayoutManager(new LinearLayoutManager(getActivity()));
-        listOfUsers.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setAdapter(mAdapter);
 
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(listOfUsers.getContext(), new LinearLayoutManager(getContext()).getOrientation());
-        listOfUsers.addItemDecoration(dividerItemDecoration);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), new LinearLayoutManager(getContext()).getOrientation());
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
 
-        displayChatList();
+        loadUserList();
     }
 
-    private void initAdapter(View view) {
+    private void initAdapter(View view)
+    {
 
         mAdapter = new UserListAdapter(getContext(), userList);
-        listOfUsers = view.findViewById(R.id.list_of_users);
+        mRecyclerView = view.findViewById(R.id.list_of_users);
 
     }
 
-    private void displayChatList() {
-        FirebaseDatabase.getInstance().getReference().child("Users").addValueEventListener(new ValueEventListener() {
+    private void loadUserList()
+    {
+        FirebaseDatabase.getInstance().getReference().child("Users").addValueEventListener(new ValueEventListener()
+        {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren())
+                {
                     User user = snapshot.getValue(User.class);
-                    if (!user.getPhone().equals(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())) {
+                    if (!user.getPhone().equals(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()))
+                    {
                         userList.put(user.getPhone(), user);
                     }
                 }
@@ -86,14 +97,16 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(DatabaseError databaseError)
+            {
 
             }
         });
     }
 
     @Override
-    public void onItemClick(String key) {
+    public void onItemClick(String key)
+    {
         Bundle bundle = new Bundle();
         bundle.putString("user_phone", key);
 
