@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.yso.charp.model.ChatTitle;
 import com.yso.charp.model.User;
 
 import java.lang.reflect.Type;
@@ -17,7 +18,8 @@ public class PersistenceManager
     private static final String LOG_TAG = PersistenceManager.class.getSimpleName();
 
     private static final String PREF_LOGGED_IN = "pref.LOGGED_IN";
-    private static final String PREF_ARRAY_LIST = "pref.ARRAY_LIST";
+    private static final String PREF_USER_LIST = "pref.USER_LIST";
+    private static final String PREF_CHAT_LIST = "pref.CHAT_LIST";
 
     private static PersistenceManager msInstance;
     private Gson mGson;
@@ -58,13 +60,27 @@ public class PersistenceManager
 
     public void setUsersMap(HashMap<String, User> hashMap)
     {
-        SecurePreferences.getInstance().setString(PREF_ARRAY_LIST, mGson.toJson(hashMap));
+        SecurePreferences.getInstance().setString(PREF_USER_LIST, mGson.toJson(hashMap));
     }
 
     public HashMap<String, User> getUsersMap()
     {
-        String branchMapDataString = SecurePreferences.getInstance().getString(PREF_ARRAY_LIST, mGson.toJson(new ArrayList<>()));
+        String branchMapDataString = SecurePreferences.getInstance().getString(PREF_USER_LIST, mGson.toJson(new ArrayList<>()));
         Type listType = new TypeToken<HashMap<String, User>>()
+        {}.getType();
+
+        return mGson.fromJson(branchMapDataString, listType);
+    }
+
+    public void setChatsMap(HashMap<String, ChatTitle> hashMap)
+    {
+        SecurePreferences.getInstance().setString(PREF_CHAT_LIST, mGson.toJson(hashMap));
+    }
+
+    public HashMap<String, ChatTitle> getChatsMap()
+    {
+        String branchMapDataString = SecurePreferences.getInstance().getString(PREF_CHAT_LIST, mGson.toJson(new ArrayList<>()));
+        Type listType = new TypeToken<HashMap<String, ChatTitle>>()
         {}.getType();
 
         return mGson.fromJson(branchMapDataString, listType);

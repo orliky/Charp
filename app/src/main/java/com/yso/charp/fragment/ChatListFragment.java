@@ -21,10 +21,8 @@ import com.yso.charp.Interface.ChatItemClickListener;
 import com.yso.charp.R;
 import com.yso.charp.activity.MainActivity;
 import com.yso.charp.adapter.ChatListAdapter;
-import com.yso.charp.adapter.UserListAdapter;
-import com.yso.charp.model.ChatMessage;
+import com.yso.charp.mannager.PersistenceManager;
 import com.yso.charp.model.ChatTitle;
-import com.yso.charp.model.User;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,7 +36,7 @@ import java.util.Map;
 public class ChatListFragment extends Fragment implements ChatItemClickListener
 {
 
-    private RecyclerView listOfChats;
+    private RecyclerView mRecyclerView;
     private HashMap<String, ChatTitle> chatList = new HashMap<>();
     private ChatListAdapter mAdapter;
 
@@ -56,21 +54,23 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        chatList = PersistenceManager.getInstance().getChatsMap();
+
         initAdapter(view);
 
         mAdapter.setClickListener(this);
-        listOfChats.setLayoutManager(new LinearLayoutManager(getActivity()));
-        listOfChats.setAdapter(mAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setAdapter(mAdapter);
 
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(listOfChats.getContext(), new LinearLayoutManager(getContext()).getOrientation());
-        listOfChats.addItemDecoration(dividerItemDecoration);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), new LinearLayoutManager(getContext()).getOrientation());
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
 
         displayChatList();
     }
 
     private void initAdapter(View view) {
         mAdapter = new ChatListAdapter(getContext(), chatList);
-        listOfChats = view.findViewById(R.id.list_of_chats);
+        mRecyclerView = view.findViewById(R.id.list_of_chats);
     }
 
     private void displayChatList() {
@@ -88,6 +88,8 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
                     chatTitle.setLastMessage(getMessage(messagesMap));
 
                     chatList.put(userMessagesEntry.getKey(), chatTitle);
+
+                    PersistenceManager.getInstance().setChatsMap(chatList);
                     mAdapter.setItems(chatList);
                 }
             }
