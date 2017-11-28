@@ -218,12 +218,6 @@ public class ChatFragment extends Fragment
 
             String push_id = user_message_push.getKey();
 
-            //            Map messageMap = new HashMap();
-            //            messageMap.put("message_list_item", message_list_item);
-            //            messageMap.put("seen", false);
-            //            messageMap.put("type", "text");
-            //            messageMap.put("time", ServerValue.TIMESTAMP);
-            //            messageMap.put("from", mCurrentUserId);
             ChatMessage chatMessage = new ChatMessage(input.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber());
 
             if (mMessageBitmap != null)
@@ -233,6 +227,8 @@ public class ChatFragment extends Fragment
                 byte[] b = stream.toByteArray();
                 String b64Image = Base64.encodeToString(b, Base64.DEFAULT);
                 chatMessage.setBase64Image(b64Image);
+
+                mMessageBitmap = null;
             }
 
             Map messageUserMap = new HashMap();
