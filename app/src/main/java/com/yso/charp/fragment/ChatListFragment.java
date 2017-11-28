@@ -54,7 +54,7 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        chatList = PersistenceManager.getInstance().getChatsMap();
+//        chatList = PersistenceManager.getInstance().getChatsMap();
 
         initAdapter(view);
 
@@ -89,7 +89,7 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
 
                     chatList.put(userMessagesEntry.getKey(), chatTitle);
 
-                    PersistenceManager.getInstance().setChatsMap(chatList);
+//                    PersistenceManager.getInstance().setChatsMap(chatList);
                     mAdapter.setItems(chatList);
                 }
             }

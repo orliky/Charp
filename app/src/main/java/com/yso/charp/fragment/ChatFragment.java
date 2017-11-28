@@ -2,20 +2,29 @@ package com.yso.charp.fragment;
 
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseListAdapter;
@@ -32,10 +41,14 @@ import com.yso.charp.model.ChatMessage;
 import com.yso.charp.model.User;
 import com.yso.charp.utils.Utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static android.app.Activity.RESULT_OK;
 
 
 /**
@@ -43,6 +56,8 @@ import java.util.Map;
  */
 public class ChatFragment extends Fragment
 {
+    private final int PICK_IMAGE_REQUEST = 71;
+
     private FirebaseListAdapter<ChatMessage> adapter;
     private RecyclerView mRecyclerView;
     private String chatWith;
@@ -53,7 +68,9 @@ public class ChatFragment extends Fragment
     private final List<ChatMessage> messagesList = new ArrayList<>();
     private LinearLayoutManager mLinearLayout;
     private ChatMessageAdapter mAdapter;
-    private boolean mIsBottom = true;
+    private Bitmap mMessageBitmap;
+    private ImageView mImageView;
+    private ImageView mChooseImage;
 
     public ChatFragment()
     {
@@ -93,6 +110,15 @@ public class ChatFragment extends Fragment
 
         loadMessages();
 
+        mImageView = (ImageView) view.findViewById(R.id.image_input);
+        mChooseImage = (ImageView) view.findViewById(R.id.message_choose_image);
+        mChooseImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                chooseImage();
+            }
+        });
         return view;
     }
 
@@ -112,6 +138,25 @@ public class ChatFragment extends Fragment
                 input.setText("");
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null)
+        {
+            Uri filePath = data.getData();
+            try
+            {
+                mMessageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
+                mImageView.setVisibility(View.VISIBLE);
+                mImageView.setImageBitmap(mMessageBitmap);
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void loadMessages()
@@ -165,7 +210,7 @@ public class ChatFragment extends Fragment
         final String message = input.getText().toString();
         if (!TextUtils.isEmpty(message) && message.trim().length() > 0)
         {
-
+            mImageView.setVisibility(View.GONE);
             String current_user_ref = "Messages/" + mCurrentUserId + "/" + mChatUser;
             String chat_user_ref = "Messages/" + mChatUser + "/" + mCurrentUserId;
 
@@ -179,12 +224,22 @@ public class ChatFragment extends Fragment
             //            messageMap.put("type", "text");
             //            messageMap.put("time", ServerValue.TIMESTAMP);
             //            messageMap.put("from", mCurrentUserId);
-            ChatMessage messageMap = new ChatMessage(input.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber());
+            ChatMessage chatMessage = new ChatMessage(input.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber());
+
+            if (mMessageBitmap != null)
+            {
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                mMessageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream); // 'bitmap' is the image returned
+                byte[] b = stream.toByteArray();
+                String b64Image = Base64.encodeToString(b, Base64.DEFAULT);
+                chatMessage.setBase64Image(b64Image);
+            }
+
             Map messageUserMap = new HashMap();
-            messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
-            messageUserMap.put(current_user_ref + "/" + "lastMessage", messageMap);
-            messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
-            messageUserMap.put(chat_user_ref + "/" + "lastMessage", messageMap);
+            messageUserMap.put(current_user_ref + "/" + push_id, chatMessage);
+            messageUserMap.put(current_user_ref + "/" + "lastMessage", chatMessage);
+            messageUserMap.put(chat_user_ref + "/" + push_id, chatMessage);
+            messageUserMap.put(chat_user_ref + "/" + "lastMessage", chatMessage);
 
             input.setText("");
 
@@ -203,6 +258,18 @@ public class ChatFragment extends Fragment
                 }
             });
         }
+        else
+        {
+            Snackbar.make(getActivity().findViewById(android.R.id.content), "אנא הכנס הודעה", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+        }
+    }
+
+    private void chooseImage()
+    {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
     }
 
     private void sendNotificationToUser(String userPhone, String message)
