@@ -24,6 +24,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.firebase.auth.FirebaseAuth;
+import com.squareup.picasso.Picasso;
 import com.yso.charp.Interface.ChatItemClickListener;
 import com.yso.charp.Interface.ImageClickListener;
 import com.yso.charp.MyApplication;
@@ -82,7 +83,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     @Override
     public void onBindViewHolder(final MessageViewHolder viewHolder, int i) {
 
-        ChatMessage c = mMessageList.get(i);
+        final ChatMessage c = mMessageList.get(i);
 
         setGravityByUser(viewHolder, c);
 
@@ -93,26 +94,38 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         viewHolder.messageTime.setText(DateFormat.format("HH:mm", c.getMessageTime()));
 
         if (c.getBase64Image() != null && !c.getBase64Image().equals("")) {
-            viewHolder.progressBar.setVisibility(View.VISIBLE);
+
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    byte[] imageBytes = Base64.decode(c.getBase64Image(), Base64.DEFAULT);
+                    Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+
+
+                    float aspectRatio = decodedImage.getWidth() / (float) decodedImage.getHeight();
+                    int width = 480;
+                    int height = Math.round(width / aspectRatio);
+                    decodedImage = Bitmap.createScaledBitmap(decodedImage, width, height, false);
+
+
+                    viewHolder.messageImage.setImageBitmap(decodedImage);
+
+                    final Bitmap finalDecodedImage = decodedImage;
+                    viewHolder.messageImage.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            mClickListener.onItemClick(finalDecodedImage);
+                        }
+                    });
+                }
+            };
+            runnable.run();
             viewHolder.messageImage.setVisibility(View.VISIBLE);
 
-            byte[] imageBytes = Base64.decode(c.getBase64Image(), Base64.DEFAULT);
-            final Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-
-            viewHolder.messageImage.setImageBitmap(decodedImage);
-            viewHolder.progressBar.setVisibility(View.GONE);
-
-            viewHolder.messageImage.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mClickListener.onItemClick(decodedImage);
-                }
-            });
-
         } else {
-            viewHolder.progressBar.setVisibility(View.GONE);
-            viewHolder.messageImage.setVisibility(View.GONE);
+            viewHolder.messageImage.setImageBitmap(null);
             viewHolder.messageImage.setOnClickListener(null);
+            viewHolder.messageImage.setVisibility(View.GONE);
         }
 
     }
@@ -139,8 +152,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         return mMessageList.size();
     }
 
-    public void setClickListener(ImageClickListener imageClickListener)
-    {
+    public void setClickListener(ImageClickListener imageClickListener) {
         this.mClickListener = imageClickListener;
     }
 }
