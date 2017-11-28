@@ -1,15 +1,20 @@
 package com.yso.charp.utils;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.view.Window;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
+import com.yso.charp.R;
 import com.yso.charp.model.Notification;
 import com.yso.charp.model.User;
 
@@ -71,5 +76,14 @@ public abstract class Utils
                 }
             }
         });
+    }
+
+    public static void openImage(Context context, Bitmap bitmap) {
+        final Dialog nagDialog = new Dialog(context, android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+        nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        nagDialog.setContentView(R.layout.preview_image);
+        ImageView ivPreview = (ImageView) nagDialog.findViewById(R.id.iv_preview_image);
+        ivPreview.setImageBitmap(bitmap);
+        nagDialog.show();
     }
 }

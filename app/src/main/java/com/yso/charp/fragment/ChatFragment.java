@@ -4,7 +4,6 @@ package com.yso.charp.fragment;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -12,11 +11,9 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,8 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,8 +29,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.yso.charp.adapter.ChatMessageAdapter;
+import com.yso.charp.Interface.ImageClickListener;
 import com.yso.charp.R;
+import com.yso.charp.adapter.ChatMessageAdapter;
 import com.yso.charp.mannager.PersistenceManager;
 import com.yso.charp.model.ChatMessage;
 import com.yso.charp.model.User;
@@ -54,7 +50,7 @@ import static android.app.Activity.RESULT_OK;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ChatFragment extends Fragment
+public class ChatFragment extends Fragment implements ImageClickListener
 {
     private final int PICK_IMAGE_REQUEST = 71;
 
@@ -100,6 +96,7 @@ public class ChatFragment extends Fragment
         mRecyclerView = (RecyclerView) view.findViewById(R.id.list_of_messages);
 
         mAdapter = new ChatMessageAdapter(getContext(), messagesList);
+        mAdapter.setClickListener(this);
         mLinearLayout = new LinearLayoutManager(getActivity());
         mLinearLayout.setStackFromEnd(true);
 
@@ -276,5 +273,10 @@ public class ChatFragment extends Fragment
         {
             Utils.sendNotification(getActivity(), user.getPhone(), mAuth.getCurrentUser().getPhoneNumber(), message, "chat_view");
         }
+    }
+
+    @Override
+    public void onItemClick(Bitmap bitmap) {
+        Utils.openImage(getActivity(), bitmap);
     }
 }
