@@ -80,13 +80,15 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         if (c.getMessageUser().equals(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())) {
             layoutParams.gravity = Gravity.START;
             viewHolder.group.setLayoutParams(layoutParams);
-            viewHolder.group.setBackgroundResource(R.drawable.my_bubble);
+            viewHolder.group.setBackgroundResource(R.drawable.bg_my_message);
             layoutParams.setMarginEnd(150);
+            viewHolder.group.setPadding(0,0,35,0);
         } else {
             layoutParams.gravity = Gravity.END;
             viewHolder.group.setLayoutParams(layoutParams);
-            viewHolder.group.setBackgroundResource(R.drawable.other_bubble);
+            viewHolder.group.setBackgroundResource(R.drawable.bg_other_message);
             layoutParams.setMarginStart(150);
+            viewHolder.group.setPadding(0,0,10,0);
         }
     }
 
