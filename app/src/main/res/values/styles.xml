@@ -51,4 +51,8 @@
         <item name="android:textSize">36sp</item>
     </style>
 
+    <style name="TextAppearence.App.TextInputLayout" parent="@android:style/TextAppearance">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/authui_colorPrimary</item>
+    </style>
 </resources>

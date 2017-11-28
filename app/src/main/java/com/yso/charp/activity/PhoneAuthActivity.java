@@ -477,8 +477,8 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
             case R.id.button_send_name:
                 if (!mNameField.getText().toString().equals(""))
                 {
-//                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(mNameField.getText().toString()).build();
-//                    mAuth.getCurrentUser().updateProfile(profileUpdates);
+                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(mNameField.getText().toString()).build();
+                    mAuth.getCurrentUser().updateProfile(profileUpdates);
 
                     FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()).
                             setValue(new User(mNameField.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(), FirebaseAuth.getInstance().getCurrentUser().getUid()));

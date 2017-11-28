@@ -11,6 +11,7 @@ public class ChatMessage {
     private String messageText;
     private String messageUser;
     private long messageTime;
+    private String mBase64Image;
 
     public ChatMessage(String messageText, String messageUser) {
         this.messageText = messageText;
@@ -46,5 +47,15 @@ public class ChatMessage {
 
     public void setMessageTime(long messageTime) {
         this.messageTime = messageTime;
+    }
+
+    public String getBase64Image()
+    {
+        return mBase64Image;
+    }
+
+    public void setBase64Image(String base64Image)
+    {
+        mBase64Image = base64Image;
     }
 }

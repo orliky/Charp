@@ -5,56 +5,55 @@
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name=".MyApplication">
-
-        <activity
-            android:name=".activity.MainActivity">
+        android:theme="@style/AppTheme">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="charp_TARGET_NOTIFICATION" />
+                <action android:name="charp_TARGET_NOTIFICATION"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.PhoneAuthActivity"
-                  android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".activity.PhoneAuthActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
 
         <receiver
             android:name="receiver.OnBootReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
 
         <service android:name=".service.FirebaseNotificationService"/>
 
+        <activity
+            android:name=".NewVersion.MainActivity1"
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
 
 
-
-
-        <activity android:name=".NewVersion.MainActivity1"
-                  android:theme="@style/AppTheme.NoActionBar">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".NewVersion.StartActivity"
-                  android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".NewVersion.StartActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".NewVersion.RegisterActivity"
             android:parentActivityName=".NewVersion.StartActivity"
@@ -63,35 +62,40 @@
             android:name=".NewVersion.LoginActivity"
             android:parentActivityName=".NewVersion.StartActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".NewVersion.SettingsActivity"
-                  android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".NewVersion.SettingsActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".NewVersion.StatusActivity"
             android:parentActivityName=".NewVersion.SettingsActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
-            android:theme="@style/Base.Theme.AppCompat" />
+            android:theme="@style/Base.Theme.AppCompat"/>
         <activity
             android:name=".NewVersion.UsersActivity"
             android:parentActivityName=".activity.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".NewVersion.ProfileActivity"
-                  android:theme="@style/AppTheme.NoActionBar">
-           <intent-filter>
-                <action android:name="in.tvac.akshaye.lapitchat_TARGET_NOTIFICATION" />
+        <activity
+            android:name=".NewVersion.ProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="in.tvac.akshaye.lapitchat_TARGET_NOTIFICATION"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
-        <activity android:name=".NewVersion.ChatActivity"
-                  android:parentActivityName=".activity.MainActivity"
-                  android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".NewVersion.ChatActivity"
+            android:parentActivityName=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
         <service android:name=".NewVersion.FirebaseMessagingService">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>
         </service>
+
     </application>
 
 </manifest>
