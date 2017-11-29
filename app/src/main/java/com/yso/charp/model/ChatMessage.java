@@ -1,5 +1,7 @@
 package com.yso.charp.model;
 
+import android.graphics.Bitmap;
+
 import java.util.Date;
 
 /**
@@ -12,6 +14,7 @@ public class ChatMessage {
     private String messageUser;
     private long messageTime;
     private String mBase64Image;
+    private Bitmap mBitmap;
 
     public ChatMessage(String messageText, String messageUser) {
         this.messageText = messageText;
@@ -57,5 +60,15 @@ public class ChatMessage {
     public void setBase64Image(String base64Image)
     {
         mBase64Image = base64Image;
+    }
+
+    public Bitmap getBitmap()
+    {
+        return mBitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap)
+    {
+        mBitmap = bitmap;
     }
 }

@@ -20,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.yso.charp.R;
 import com.yso.charp.activity.MainActivity;
 import com.yso.charp.model.Notification;
+import com.yso.charp.utils.Utils;
 
 
 public class FirebaseNotificationService extends Service {
@@ -68,8 +69,7 @@ public class FirebaseNotificationService extends Service {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if(dataSnapshot != null){
                     Notification notification = dataSnapshot.getValue(Notification.class);
-
-                    showNotification(context,notification,dataSnapshot.getKey());
+                    Utils.showNotification(mDatabase, firebaseAuth, context, notification,dataSnapshot.getKey());
                 }
             }
 
@@ -93,11 +93,7 @@ public class FirebaseNotificationService extends Service {
 
             }
         });
-
-
     }
-
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -117,52 +113,6 @@ public class FirebaseNotificationService extends Service {
     }
 
 
-
-
-    private void showNotification(Context context, Notification notification, String notification_key){
-        flagNotificationAsSent(notification_key);
-
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(notification.getDescription())
-                .setDefaults(NotificationCompat.DEFAULT_ALL)
-                .setContentText(Html.fromHtml(notification.getMessage()
-                ))
-                .setAutoCancel(true);
-
-        Intent backIntent = new Intent(context, MainActivity.class);
-        backIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        Intent intent = new Intent(context, MainActivity.class);
-
-        /*  Use the notification type to switch activity to stack on the main activity*/
-        if(notification.getType().equals("chat_view")){
-            intent = new Intent(context, MainActivity.class);
-        }
-
-
-        final PendingIntent pendingIntent = PendingIntent.getActivities(context, 900,
-                new Intent[] {backIntent}, PendingIntent.FLAG_ONE_SHOT);
-
-
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(MainActivity.class);
-
-        mBuilder.setContentIntent(pendingIntent);
-
-
-        NotificationManager mNotificationManager =  (NotificationManager)context. getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(1, mBuilder.build());
-
-    }
-
-    private void flagNotificationAsSent(String notification_key) {
-        mDatabase.getReference().child("notifications")
-                .child(firebaseAuth.getCurrentUser().getPhoneNumber())
-                .child(notification_key)
-                .child("status")
-                .setValue(1);
-    }
 
 
 }

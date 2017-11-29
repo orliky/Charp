@@ -4,6 +4,7 @@ package com.yso.charp.fragment;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -109,7 +110,8 @@ public class ChatFragment extends Fragment implements ImageClickListener
 
         mImageView = (ImageView) view.findViewById(R.id.image_input);
         mChooseImage = (ImageView) view.findViewById(R.id.message_choose_image);
-        mChooseImage.setOnClickListener(new View.OnClickListener() {
+        mChooseImage.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View v)
             {
@@ -147,6 +149,12 @@ public class ChatFragment extends Fragment implements ImageClickListener
             try
             {
                 mMessageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
+
+                float aspectRatio = mMessageBitmap.getWidth() / (float) mMessageBitmap.getHeight();
+                int width = 480;
+                int height = Math.round(width / aspectRatio);
+                mMessageBitmap = Bitmap.createScaledBitmap(mMessageBitmap, width, height, false);
+
                 mImageView.setVisibility(View.VISIBLE);
                 mImageView.setImageBitmap(mMessageBitmap);
             } catch (IOException e)
@@ -167,12 +175,19 @@ public class ChatFragment extends Fragment implements ImageClickListener
                 {
                     ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
 
+                    if (chatMessage.getBase64Image() != null && !chatMessage.getBase64Image().equals(""))
+                    {
+                        byte[] imageBytes = Base64.decode(chatMessage.getBase64Image(), Base64.DEFAULT);
+                        Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+
+                        chatMessage.setBitmap(decodedImage);
+                    }
                     messagesList.add(chatMessage);
-                    mAdapter.notifyDataSetChanged();
+                    //                    mAdapter.notifyDataSetChanged();
 
                     mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
                 }
-
+                mAdapter.setItems(messagesList);
             }
 
             @Override
@@ -269,14 +284,15 @@ public class ChatFragment extends Fragment implements ImageClickListener
     {
         HashMap users = PersistenceManager.getInstance().getUsersMap();
         User user = (User) users.get(userPhone);
-        if (!user.getPhone().equals(mAuth.getCurrentUser().getPhoneNumber()))
+        if (user != null && !user.getPhone().equals(mAuth.getCurrentUser().getPhoneNumber()))
         {
             Utils.sendNotification(getActivity(), user.getPhone(), mAuth.getCurrentUser().getPhoneNumber(), message, "chat_view");
         }
     }
 
     @Override
-    public void onItemClick(Bitmap bitmap) {
-        Utils.openImage(getActivity(), bitmap);
+    public void onItemClick(Bitmap bitmap)
+    {
+        Utils.openDialogImage(getActivity(), bitmap);
     }
 }

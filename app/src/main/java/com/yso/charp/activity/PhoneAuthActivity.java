@@ -29,6 +29,7 @@ import com.yso.charp.R;
 import com.yso.charp.activity.MainActivity;
 import com.yso.charp.model.User;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class PhoneAuthActivity extends AppCompatActivity implements View.OnClickListener

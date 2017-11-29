@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
 import android.util.Base64;
@@ -35,21 +36,24 @@ import com.yso.charp.utils.Utils;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
-public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.MessageViewHolder> {
+public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.MessageViewHolder>
+{
 
 
     private List<ChatMessage> mMessageList;
     private Context mContext;
     private ImageClickListener mClickListener;
 
-    public ChatMessageAdapter(Context context, List<ChatMessage> mMessageList) {
+    public ChatMessageAdapter(Context context, List<ChatMessage> mMessageList)
+    {
 
         this.mContext = context;
         this.mMessageList = mMessageList;
     }
 
     @Override
-    public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
+    {
 
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_item, parent, false);
 
@@ -57,7 +61,14 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
     }
 
-    class MessageViewHolder extends RecyclerView.ViewHolder {
+    public void setItems(List<ChatMessage> messagesList)
+    {
+        this.mMessageList = messagesList;
+        notifyDataSetChanged();
+    }
+
+    class MessageViewHolder extends RecyclerView.ViewHolder
+    {
 
         LinearLayout group;
         TextView messageText;
@@ -66,7 +77,8 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         ImageView messageImage;
         ProgressBar progressBar;
 
-        MessageViewHolder(View view) {
+        MessageViewHolder(View view)
+        {
             super(view);
 
             group = view.findViewById(R.id.message_group);
@@ -79,9 +91,10 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         }
     }
 
-    @SuppressLint("NewApi")
+    @SuppressLint ("NewApi")
     @Override
-    public void onBindViewHolder(final MessageViewHolder viewHolder, int i) {
+    public void onBindViewHolder(final MessageViewHolder viewHolder, int i)
+    {
 
         final ChatMessage c = mMessageList.get(i);
 
@@ -93,36 +106,40 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         viewHolder.messageText.setText(c.getMessageText());
         viewHolder.messageTime.setText(DateFormat.format("HH:mm", c.getMessageTime()));
 
-        if (c.getBase64Image() != null && !c.getBase64Image().equals("")) {
+        if (c.getBitmap() != null)
+        {
+        /*if (c.getBase64Image() != null && !c.getBase64Image().equals(""))
+        {
 
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    byte[] imageBytes = Base64.decode(c.getBase64Image(), Base64.DEFAULT);
-                    Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-
-
-                    float aspectRatio = decodedImage.getWidth() / (float) decodedImage.getHeight();
-                    int width = 480;
-                    int height = Math.round(width / aspectRatio);
-                    decodedImage = Bitmap.createScaledBitmap(decodedImage, width, height, false);
+            byte[] imageBytes = Base64.decode(c.getBase64Image(), Base64.DEFAULT);
+            Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
 
 
-                    viewHolder.messageImage.setImageBitmap(decodedImage);
+//            Bitmap ThumbImage = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length), 50, 50);
 
-                    final Bitmap finalDecodedImage = decodedImage;
-                    viewHolder.messageImage.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            mClickListener.onItemClick(finalDecodedImage);
-                        }
-                    });
-                }
-            };
-            runnable.run();
+            float aspectRatio = decodedImage.getWidth() / (float) decodedImage.getHeight();
+            int width = 480;
+            int height = Math.round(width / aspectRatio);
+            decodedImage = Bitmap.createScaledBitmap(decodedImage, width, height, false);
+
+
+            viewHolder.messageImage.setImageBitmap(decodedImage);
+
+            final Bitmap finalDecodedImage = decodedImage;*/
+            viewHolder.messageImage.setImageBitmap(c.getBitmap());
             viewHolder.messageImage.setVisibility(View.VISIBLE);
+            viewHolder.messageImage.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    mClickListener.onItemClick(c.getBitmap());
+                }
+            });
 
-        } else {
+        }
+        else
+        {
             viewHolder.messageImage.setImageBitmap(null);
             viewHolder.messageImage.setOnClickListener(null);
             viewHolder.messageImage.setVisibility(View.GONE);
@@ -130,15 +147,19 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
     }
 
-    private void setGravityByUser(MessageViewHolder viewHolder, ChatMessage c) {
+    private void setGravityByUser(MessageViewHolder viewHolder, ChatMessage c)
+    {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        if (c.getMessageUser().equals(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber())) {
+        if (c.getMessageUser().equals(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()))
+        {
             layoutParams.gravity = Gravity.START;
             viewHolder.group.setLayoutParams(layoutParams);
             viewHolder.group.setBackgroundResource(R.drawable.bg_my_message);
             layoutParams.setMarginEnd(150);
             viewHolder.group.setPadding(0, 0, 35, 0);
-        } else {
+        }
+        else
+        {
             layoutParams.gravity = Gravity.END;
             viewHolder.group.setLayoutParams(layoutParams);
             viewHolder.group.setBackgroundResource(R.drawable.bg_other_message);
@@ -148,11 +169,13 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     }
 
     @Override
-    public int getItemCount() {
+    public int getItemCount()
+    {
         return mMessageList.size();
     }
 
-    public void setClickListener(ImageClickListener imageClickListener) {
+    public void setClickListener(ImageClickListener imageClickListener)
+    {
         this.mClickListener = imageClickListener;
     }
 }

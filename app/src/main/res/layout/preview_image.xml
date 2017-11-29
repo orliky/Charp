@@ -4,9 +4,18 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
-    <ImageView
+    <com.yso.charp.utils.TouchImageView
         android:id="@+id/iv_preview_image"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
+
+    <ImageView
+        android:id="@+id/close_preview"
+        android:layout_alignParentRight="true"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/close"/>
 
 </RelativeLayout>

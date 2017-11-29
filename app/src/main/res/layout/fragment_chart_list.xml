@@ -4,6 +4,13 @@
              android:layout_height="match_parent"
              tools:context="com.yso.charp.fragment.UserListFragment">
 
+    <ProgressBar
+        android:visibility="gone"
+        android:id="@+id/chat_list_progress"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center"/>
+
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

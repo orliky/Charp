@@ -18,13 +18,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.yso.charp.Interface.ChatItemClickListener;
+import com.yso.charp.Interface.UpdateUsersListener;
 import com.yso.charp.activity.MainActivity;
 import com.yso.charp.adapter.UserListAdapter;
 import com.yso.charp.R;
 import com.yso.charp.mannager.PersistenceManager;
 import com.yso.charp.model.User;
+import com.yso.charp.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -66,7 +70,7 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), new LinearLayoutManager(getContext()).getOrientation());
         mRecyclerView.addItemDecoration(dividerItemDecoration);
 
-        loadUserList();
+        loadClientUsers();
     }
 
     private void initAdapter(View view)
@@ -77,13 +81,14 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
 
     }
 
-    private void loadUserList()
+    private void loadClientUsers()
     {
-        FirebaseDatabase.getInstance().getReference().child("Users").addValueEventListener(new ValueEventListener()
+        FirebaseDatabase.getInstance().getReference().child("ClientUsers").child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()).addValueEventListener(new ValueEventListener()
         {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
+                userList.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren())
                 {
                     User user = snapshot.getValue(User.class);
@@ -102,6 +107,15 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
 
             }
         });
+
+        Utils.updateClientUsers(new UpdateUsersListener()
+        {
+            @Override
+            public void onDataChange(HashMap<String, User> data)
+            {
+                mAdapter.setItems(data);
+            }
+        });
     }
 
     @Override
@@ -112,4 +126,6 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
 
         ((MainActivity) getActivity()).addChatFragment(bundle);
     }
+
+
 }

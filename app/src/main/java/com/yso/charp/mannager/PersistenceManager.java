@@ -20,6 +20,7 @@ public class PersistenceManager
     private static final String PREF_LOGGED_IN = "pref.LOGGED_IN";
     private static final String PREF_USER_LIST = "pref.USER_LIST";
     private static final String PREF_CHAT_LIST = "pref.CHAT_LIST";
+    private static final String PREF_CONTACT_PHONE_LIST = "pref.CONTACT_PHONE_LIST";
 
     private static PersistenceManager msInstance;
     private Gson mGson;
@@ -81,6 +82,20 @@ public class PersistenceManager
     {
         String branchMapDataString = SecurePreferences.getInstance().getString(PREF_CHAT_LIST, mGson.toJson(new ArrayList<>()));
         Type listType = new TypeToken<HashMap<String, ChatTitle>>()
+        {}.getType();
+
+        return mGson.fromJson(branchMapDataString, listType);
+    }
+
+    public void setContactPhoneNumbers(ArrayList arrayList)
+    {
+        SecurePreferences.getInstance().setString(PREF_CONTACT_PHONE_LIST, mGson.toJson(arrayList));
+    }
+
+    public ArrayList getContactPhoneNumbers()
+    {
+        String branchMapDataString = SecurePreferences.getInstance().getString(PREF_CONTACT_PHONE_LIST, mGson.toJson(new ArrayList<>()));
+        Type listType = new TypeToken<ArrayList>()
         {}.getType();
 
         return mGson.fromJson(branchMapDataString, listType);
