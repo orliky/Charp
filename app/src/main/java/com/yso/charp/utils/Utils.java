@@ -27,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.yso.charp.Interface.UpdateUsersListener;
+import com.yso.charp.MyApplication;
 import com.yso.charp.R;
 import com.yso.charp.activity.MainActivity;
 import com.yso.charp.mannager.PersistenceManager;
@@ -45,14 +46,14 @@ import java.util.Map;
 public abstract class Utils
 {
 
-    public static String getContactName(final String phoneNumber, Context context)
+    public static String getContactName(final String phoneNumber)
     {
         Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
 
         String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
 
         String contactName = "";
-        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
+        Cursor cursor = MyApplication.getAppContext().getContentResolver().query(uri, projection, null, null, null);
 
         if (cursor != null)
         {
@@ -226,7 +227,7 @@ public abstract class Utils
                     }
                 }
 
-                ArrayList contacts = PersistenceManager.getInstance().getContactPhoneNumbers();
+                ArrayList contacts = Utils.getAllContactPhoneNumbers(MyApplication.getAppContext());
 
                 for (Object phone : contacts)
                 {

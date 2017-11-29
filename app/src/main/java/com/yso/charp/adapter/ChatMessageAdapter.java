@@ -100,7 +100,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
         setGravityByUser(viewHolder, c);
 
-        String contactName = Utils.getContactName(c.getMessageUser(), mContext);
+        String contactName = Utils.getContactName(c.getMessageUser());
         String name = contactName.equals("") ? c.getMessageUser() : contactName;
         viewHolder.displayName.setText(name);
         viewHolder.messageText.setText(c.getMessageText());
