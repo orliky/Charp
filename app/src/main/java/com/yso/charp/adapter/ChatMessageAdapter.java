@@ -46,12 +46,6 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
     }
 
-    public void setItems(List<ChatMessage> messagesList)
-    {
-        this.mMessageList = messagesList;
-        notifyDataSetChanged();
-    }
-
     class MessageViewHolder extends RecyclerView.ViewHolder
     {
 

@@ -104,15 +104,15 @@ public class PersistenceManager
         return mGson.fromJson(branchMapDataString, listType);
     }
 
-    public void setChatMap(HashMap<String, List> hashMap)
+    public void setChatMap(HashMap<String, List<ChatMessage>> hashMap)
     {
         SecurePreferences.getInstance().setString(PREF_CHAT, mGson.toJson(hashMap));
     }
 
-    public HashMap<String, List> getChatMap()
+    public HashMap<String, List<ChatMessage>> getChatMap()
     {
         String branchMapDataString = SecurePreferences.getInstance().getString(PREF_CHAT, mGson.toJson(new ArrayList<>()));
-        Type listType = new TypeToken<HashMap<String, List>>()
+        Type listType = new TypeToken<HashMap<String, List<ChatMessage>>>()
         {}.getType();
 
         return mGson.fromJson(branchMapDataString, listType);

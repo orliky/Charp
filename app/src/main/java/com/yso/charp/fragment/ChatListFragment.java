@@ -77,7 +77,8 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
 
         chatList = PersistenceManager.getInstance().getChatsMap();
 
-        initAdapter(view);
+        mAdapter = new ChatListAdapter(getContext(), chatList);
+        mRecyclerView = view.findViewById(R.id.list_of_chats);
 
         mAdapter.setClickListener(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -89,12 +90,6 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
         mProgressBar = view.findViewById(R.id.chat_list_progress);
 
         loadChatList();
-    }
-
-    private void initAdapter(View view)
-    {
-        mAdapter = new ChatListAdapter(getContext(), chatList);
-        mRecyclerView = view.findViewById(R.id.list_of_chats);
     }
 
     private void loadChatList()

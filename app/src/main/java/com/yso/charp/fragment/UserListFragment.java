@@ -68,7 +68,8 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
 
         userList = PersistenceManager.getInstance().getUsersMap();
 
-        initAdapter(view);
+        mAdapter = new UserListAdapter(getContext(), userList);
+        mRecyclerView = view.findViewById(R.id.list_of_users);
 
         mAdapter.setClickListener(this);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -78,14 +79,6 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
         mRecyclerView.addItemDecoration(dividerItemDecoration);
 
         loadClientUsers();
-    }
-
-    private void initAdapter(View view)
-    {
-
-        mAdapter = new UserListAdapter(getContext(), userList);
-        mRecyclerView = view.findViewById(R.id.list_of_users);
-
     }
 
     private void loadClientUsers()
