@@ -36,6 +36,7 @@ import com.yso.charp.adapter.ChatMessageAdapter;
 import com.yso.charp.mannager.FireBaseManager;
 import com.yso.charp.mannager.PersistenceManager;
 import com.yso.charp.model.ChatMessage;
+import com.yso.charp.model.ChatTitle;
 import com.yso.charp.model.User;
 import com.yso.charp.utils.NotificationUtils;
 
@@ -59,11 +60,12 @@ public class ChatFragment extends Fragment implements ImageClickListener
     private EditText input;
     private String mCurrentUserId, mChatUser;
     private DatabaseReference mRootRef;
-    FirebaseUser mFirebaseUser;
-    private final List<ChatMessage> messagesList = new ArrayList<>();
+    private FirebaseUser mFirebaseUser;
+    private List<ChatMessage> messagesList = new ArrayList<>();
     private ChatMessageAdapter mAdapter;
     private Bitmap mMessageBitmap;
     private ImageView mImageView;
+    private HashMap<String, List> mChatMap = new HashMap<>();
 
     public ChatFragment()
     {
@@ -90,6 +92,8 @@ public class ChatFragment extends Fragment implements ImageClickListener
         }
 
         mRecyclerView = view.findViewById(R.id.list_of_messages);
+//        mChatMap = PersistenceManager.getInstance().getChatMap();
+//        messagesList = mChatMap.get(mChatUser) == null ? new ArrayList<ChatMessage>() : mChatMap.get(mChatUser);
         mAdapter = new ChatMessageAdapter(getContext(), messagesList);
 
         loadMessages();
@@ -179,6 +183,8 @@ public class ChatFragment extends Fragment implements ImageClickListener
                     messagesList.add(chatMessage);
                     mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
                 }
+//                mChatMap.put(mChatUser, messagesList);
+//                PersistenceManager.getInstance().setChatMap(mChatMap);
                 mAdapter.setItems(messagesList);
             }
 
@@ -211,7 +217,7 @@ public class ChatFragment extends Fragment implements ImageClickListener
     private void sendMessage()
     {
         final String message = input.getText().toString();
-        if (!TextUtils.isEmpty(message) && message.trim().length() > 0)
+        if ((!TextUtils.isEmpty(message) && message.trim().length() > 0) || mMessageBitmap != null)
         {
             mImageView.setVisibility(View.GONE);
             String current_user_ref = FB_CHILD_MESSAGES + "/" + mCurrentUserId + "/" + mChatUser;
@@ -219,7 +225,7 @@ public class ChatFragment extends Fragment implements ImageClickListener
 
             DatabaseReference user_message_push = mRootRef.child(FB_CHILD_MESSAGES).child(mCurrentUserId).child(mChatUser).push();
             String push_id = user_message_push.getKey();
-            ChatMessage chatMessage = new ChatMessage(input.getText().toString(), mFirebaseUser.getPhoneNumber());
+            ChatMessage chatMessage = new ChatMessage(message, mFirebaseUser.getPhoneNumber());
 
             if (mMessageBitmap != null)
             {
@@ -256,7 +262,7 @@ public class ChatFragment extends Fragment implements ImageClickListener
         }
         else
         {
-            Snackbar.make(getActivity().findViewById(android.R.id.content), "אנא הכנס הודעה", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+            Snackbar.make(getActivity().findViewById(android.R.id.content), "אנא הכנס הודעה או תמונה", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
         }
     }
 
