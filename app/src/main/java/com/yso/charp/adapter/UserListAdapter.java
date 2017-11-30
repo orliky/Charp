@@ -57,7 +57,7 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         UserViewHolder userViewHolder = (UserViewHolder) holder;
         userViewHolder.mName.setText(user.getName());
-        String contactName =  Utils.getContactName(user.getPhone(), mContext);
+        String contactName =  Utils.getContactName(user.getPhone());
         String name = contactName.equals("") ? user.getPhone() : contactName;
         userViewHolder.mPhone.setText(name);
 

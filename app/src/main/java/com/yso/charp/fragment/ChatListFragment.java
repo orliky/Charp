@@ -44,9 +44,8 @@ import java.util.Map;
 /**
  * A simple {@link Fragment} subclass.
  */
-@SuppressLint ("ValidFragment")
-public class ChatListFragment extends Fragment implements ChatItemClickListener
-{
+@SuppressLint("ValidFragment")
+public class ChatListFragment extends Fragment implements ChatItemClickListener {
 
     private RecyclerView mRecyclerView;
     private HashMap<String, ChatTitle> chatList = new HashMap<>();
@@ -54,20 +53,17 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
     private ProgressBar mProgressBar;
 
 
-    public ChatListFragment()
-    {
+    public ChatListFragment() {
     }
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_chart_list, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
-    {
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         chatList = PersistenceManager.getInstance().getChatsMap();
@@ -81,32 +77,26 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), new LinearLayoutManager(getContext()).getOrientation());
         mRecyclerView.addItemDecoration(dividerItemDecoration);
 
-        mProgressBar = (ProgressBar) view.findViewById(R.id.chat_list_progress) ;
+        mProgressBar = (ProgressBar) view.findViewById(R.id.chat_list_progress);
 
         displayChatList();
     }
 
-    private void initAdapter(View view)
-    {
+    private void initAdapter(View view) {
         mAdapter = new ChatListAdapter(getContext(), chatList);
         mRecyclerView = view.findViewById(R.id.list_of_chats);
     }
 
-    private void displayChatList()
-    {
+    private void displayChatList() {
         mProgressBar.setVisibility(View.VISIBLE);
-        FirebaseDatabase.getInstance().getReference().child("Messages").child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()).addValueEventListener(new ValueEventListener()
-        {
+        FirebaseDatabase.getInstance().getReference().child("Messages").child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
+            public void onDataChange(DataSnapshot dataSnapshot) {
                 Map userMessagesMap = (Map) dataSnapshot.getValue();
-                if (userMessagesMap != null)
-                {
+                if (userMessagesMap != null) {
 
                     Iterator iterator = userMessagesMap.entrySet().iterator();
-                    while (iterator.hasNext())
-                    {
+                    while (iterator.hasNext()) {
                         Map.Entry<String, String> userMessagesEntry = (Map.Entry<String, String>) iterator.next();
                         Map messagesMap = (Map) userMessagesMap.get(userMessagesEntry.getKey());
 
@@ -123,29 +113,23 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-
+            public void onCancelled(DatabaseError databaseError) {
+                mProgressBar.setVisibility(View.GONE);
             }
         });
     }
 
-    private String getMessage(Map messagesMap)
-    {
+    private String getMessage(Map messagesMap) {
         String message = null;
         Iterator iterator = messagesMap.keySet().iterator();
-        while (iterator.hasNext())
-        {
+        while (iterator.hasNext()) {
             String key = (String) iterator.next();
-            if (key.equals("lastMessage"))
-            {
+            if (key.equals("lastMessage")) {
                 Map lastMessageMap = (Map) messagesMap.get(key);
                 Iterator iter = lastMessageMap.keySet().iterator();
-                while (iter.hasNext())
-                {
+                while (iter.hasNext()) {
                     String k = (String) iter.next();
-                    if (k.equals("messageText"))
-                    {
+                    if (k.equals("messageText")) {
                         message = (String) lastMessageMap.get(k);
                     }
                 }
@@ -169,16 +153,15 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
         }
     }
 
-    private void goToChatFragment(String key)
-    {
+    private void goToChatFragment(String key) {
         Bundle bundle = new Bundle();
         bundle.putString("user_phone", key);
 
         ((MainActivity) getActivity()).addChatFragment(bundle);
+        getActivity().setTitle("Charp - " + Utils.getContactName(key));
     }
 
-    private void showNewUserDialog(final String key)
-    {
+    private void showNewUserDialog(final String key) {
         AlertDialog.Builder builder;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             builder = new AlertDialog.Builder(getActivity(), android.R.style.Theme_Material_Dialog_Alert);
@@ -189,18 +172,17 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
                 .setMessage("להוסיף לאנשי קשר?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        mProgressBar.setVisibility(View.VISIBLE);
 
                         Intent i = new Intent(Intent.ACTION_INSERT_OR_EDIT);
                         i.setType(ContactsContract.Contacts.CONTENT_ITEM_TYPE);
-                        i.putExtra(ContactsContract.Intents.Insert.PHONE,key);
+                        i.putExtra(ContactsContract.Intents.Insert.PHONE, key);
                         startActivity(i);
 
                     }
                 })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
+                        dialog.dismiss();
                     }
                 })
                 .setIcon(android.R.drawable.ic_dialog_alert)

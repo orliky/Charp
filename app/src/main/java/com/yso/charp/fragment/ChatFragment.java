@@ -106,8 +106,6 @@ public class ChatFragment extends Fragment implements ImageClickListener
 
         mRecyclerView.setAdapter(mAdapter);
 
-        loadMessages();
-
         mImageView = (ImageView) view.findViewById(R.id.image_input);
         mChooseImage = (ImageView) view.findViewById(R.id.message_choose_image);
         mChooseImage.setOnClickListener(new View.OnClickListener()
@@ -162,6 +160,12 @@ public class ChatFragment extends Fragment implements ImageClickListener
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadMessages();
     }
 
     private void loadMessages()

@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity
         {
             Snackbar.make(findViewById(android.R.id.content), "Welcome " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show();
 
-            PersistenceManager.getInstance().setContactPhoneNumbers(Utils.getAllContactPhoneNumbers(this));
+//            PersistenceManager.getInstance().setContactPhoneNumbers(Utils.getAllContactPhoneNumbers(this));
 
             mContainer = (FrameLayout) findViewById(R.id.container);
             mAppBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
@@ -190,6 +190,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
+        setTitle("Charp");
         if (mContainer.getVisibility() == View.GONE)
         {
             super.onBackPressed();
@@ -197,6 +198,7 @@ public class MainActivity extends AppCompatActivity
         else
         {
             mContainer.setVisibility(View.GONE);
+            getSupportFragmentManager().beginTransaction().remove(getSupportFragmentManager().findFragmentById(R.id.container)).commit();
             mAppBarLayout.setVisibility(View.VISIBLE);
         }
     }
