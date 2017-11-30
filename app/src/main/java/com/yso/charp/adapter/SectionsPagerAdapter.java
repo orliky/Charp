@@ -1,18 +1,15 @@
-package com.yso.charp.fragment;
+package com.yso.charp.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 
-import com.yso.charp.NewVersion.RequestsFragment;
-
-/**
- * Created by AkshayeJH on 11/06/17.
- */
+import com.yso.charp.fragment.ChatListFragment;
+import com.yso.charp.fragment.UserListFragment;
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter
 {
-
 
     public SectionsPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -23,12 +20,10 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter
 
         switch(position) {
             case 0:
-                ChatListFragment chatListFragment = new ChatListFragment();
-                return  chatListFragment;
+                return ChatListFragment.getInstance();
 
             case 1:
-                UserListFragment userListFragment = new UserListFragment();
-                return userListFragment;
+                return UserListFragment.getInstance();
 
             default:
                 return  null;
@@ -53,7 +48,5 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter
             default:
                 return null;
         }
-
     }
-
 }

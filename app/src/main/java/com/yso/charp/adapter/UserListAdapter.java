@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.yso.charp.Interface.ChatItemClickListener;
 import com.yso.charp.R;
 import com.yso.charp.model.User;
-import com.yso.charp.utils.Utils;
+import com.yso.charp.utils.ContactsUtils;
 
 import java.util.HashMap;
 
@@ -57,7 +57,7 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
         UserViewHolder userViewHolder = (UserViewHolder) holder;
         userViewHolder.mName.setText(user.getName());
-        String contactName =  Utils.getContactName(user.getPhone());
+        String contactName =  ContactsUtils.getContactName(user.getPhone());
         String name = contactName.equals("") ? user.getPhone() : contactName;
         userViewHolder.mPhone.setText(name);
 

@@ -18,17 +18,17 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.yso.charp.Interface.ChatItemClickListener;
-import com.yso.charp.Interface.UpdateUsersListener;
+import com.yso.charp.MyApplication;
+import com.yso.charp.R;
 import com.yso.charp.activity.MainActivity;
 import com.yso.charp.adapter.UserListAdapter;
-import com.yso.charp.R;
+import com.yso.charp.mannager.FireBaseManager;
 import com.yso.charp.mannager.PersistenceManager;
 import com.yso.charp.model.User;
-import com.yso.charp.utils.Utils;
+import com.yso.charp.utils.ContactsUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -41,12 +41,19 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
     private RecyclerView mRecyclerView;
     private HashMap<String, User> userList = new HashMap<>();
     private UserListAdapter mAdapter;
-
+    private static UserListFragment mInstance;
 
     public UserListFragment()
     {
     }
-
+    public static UserListFragment getInstance()
+    {
+        if (mInstance == null)
+        {
+            mInstance = new UserListFragment();
+        }
+        return mInstance;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -83,8 +90,7 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
 
     private void loadClientUsers()
     {
-        FirebaseDatabase.getInstance().getReference().child("ClientUsers").child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()).addValueEventListener(new ValueEventListener()
-        {
+        FireBaseManager.loadClientUsers(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot)
             {
@@ -107,15 +113,6 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
 
             }
         });
-
-        Utils.updateClientUsers(new UpdateUsersListener()
-        {
-            @Override
-            public void onDataChange(HashMap<String, User> data)
-            {
-                mAdapter.setItems(data);
-            }
-        });
     }
 
     @Override
@@ -125,7 +122,7 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
         bundle.putString("user_phone", key);
 
         ((MainActivity) getActivity()).addChatFragment(bundle);
-        getActivity().setTitle("Charp - " + Utils.getContactName(key));
+        getActivity().setTitle("Charp - " + ContactsUtils.getContactName(key));
     }
 
 

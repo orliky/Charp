@@ -23,13 +23,9 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.database.FirebaseDatabase;
 import com.yso.charp.R;
-import com.yso.charp.activity.MainActivity;
-import com.yso.charp.model.User;
+import com.yso.charp.mannager.FireBaseManager;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class PhoneAuthActivity extends AppCompatActivity implements View.OnClickListener
@@ -409,8 +405,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
             else
             {
                 mDetailText.setText(getString(R.string.firebase_status_fmt, user.getDisplayName()));
-                FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()).
-                        setValue(new User(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(), FirebaseAuth.getInstance().getCurrentUser().getUid()));
+                FireBaseManager.setUser();
 
                 startActivity(new Intent(this, MainActivity.class));
                 finish();
@@ -478,11 +473,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
             case R.id.button_send_name:
                 if (!mNameField.getText().toString().equals(""))
                 {
-                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(mNameField.getText().toString()).build();
-                    mAuth.getCurrentUser().updateProfile(profileUpdates);
-
-                    FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()).
-                            setValue(new User(mNameField.getText().toString(), FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(), FirebaseAuth.getInstance().getCurrentUser().getUid()));
+                    FireBaseManager.updateName(mNameField.getText().toString());
 
                     startActivity(new Intent(this, MainActivity.class));
                     finish();

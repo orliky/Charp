@@ -1,41 +1,33 @@
 package com.yso.charp.activity;
 
 import android.Manifest;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.auth.FirebaseUser;
+import com.yso.charp.Interface.SignOutListener;
 import com.yso.charp.R;
+import com.yso.charp.adapter.SectionsPagerAdapter;
 import com.yso.charp.fragment.ChatFragment;
-import com.yso.charp.fragment.SectionsPagerAdapter;
+import com.yso.charp.fragment.ChatListFragment;
 import com.yso.charp.fragment.UserListFragment;
-import com.yso.charp.mannager.PersistenceManager;
-import com.yso.charp.model.User;
+import com.yso.charp.mannager.FireBaseManager;
+import com.yso.charp.receiver.MyContentObserver;
 import com.yso.charp.service.FirebaseNotificationService;
-import com.yso.charp.utils.Utils;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -51,6 +43,8 @@ public class MainActivity extends AppCompatActivity
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private FrameLayout mContainer;
     private AppBarLayout mAppBarLayout;
+    private FirebaseUser mFirebaseUser;
+    private MyContentObserver contentObserver = new MyContentObserver();
 
     @RequiresApi (api = Build.VERSION_CODES.M)
     @Override
@@ -58,6 +52,8 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mFirebaseUser = FireBaseManager.getFirebaseUser();
 
         checkPernission();
     }
@@ -79,17 +75,19 @@ public class MainActivity extends AppCompatActivity
 
     private void init()
     {
-        if (FirebaseAuth.getInstance().getCurrentUser() == null)
+        if (mFirebaseUser == null)
         {
-//            startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().build(), SIGN_IN_REQUEST_CODE);
-                        startActivity(new Intent(this, PhoneAuthActivity.class));
-                        finish();
+            //            startActivityForResult(AuthUI.getInstance().createSignInIntentBuilder().build(), SIGN_IN_REQUEST_CODE);
+            startActivity(new Intent(this, PhoneAuthActivity.class));
+            finish();
         }
         else
         {
-            Snackbar.make(findViewById(android.R.id.content), "Welcome " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+            getApplicationContext().getContentResolver().registerContentObserver(ContactsContract.Contacts.CONTENT_URI, true, contentObserver);
+            FireBaseManager.updateClientUsers();
+            Snackbar.make(findViewById(android.R.id.content), "Welcome " + mFirebaseUser.getDisplayName(), Snackbar.LENGTH_SHORT).setAction("Action", null).show();
 
-//            PersistenceManager.getInstance().setContactPhoneNumbers(Utils.getAllContactPhoneNumbers(this));
+            //            PersistenceManager.getInstance().setContactPhoneNumbers(DialogUtils.getAllContactPhoneNumbers(this));
 
             mContainer = (FrameLayout) findViewById(R.id.container);
             mAppBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
@@ -119,10 +117,10 @@ public class MainActivity extends AppCompatActivity
 
         if (item.getItemId() == R.id.menu_sign_out)
         {
-            AuthUI.getInstance().signOut(this).addOnCompleteListener(new OnCompleteListener<Void>()
+            FireBaseManager.signOut(this, new SignOutListener()
             {
                 @Override
-                public void onComplete(@NonNull Task<Void> task)
+                public void onComplete()
                 {
                     finish();
                 }
@@ -210,6 +208,5 @@ public class MainActivity extends AppCompatActivity
         ChatFragment chatFragment = new ChatFragment();
         chatFragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction().replace(R.id.container, chatFragment).commit();
-        //        setTitle("Chat");
     }
 }

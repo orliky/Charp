@@ -1,39 +1,24 @@
 package com.yso.charp.adapter;
 
 import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
-import android.util.Base64;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.firebase.auth.FirebaseAuth;
-import com.squareup.picasso.Picasso;
-import com.yso.charp.Interface.ChatItemClickListener;
 import com.yso.charp.Interface.ImageClickListener;
-import com.yso.charp.MyApplication;
 import com.yso.charp.R;
 import com.yso.charp.model.ChatMessage;
-import com.yso.charp.utils.Utils;
+import com.yso.charp.utils.ContactsUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.MessageViewHolder>
@@ -100,7 +85,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
         setGravityByUser(viewHolder, c);
 
-        String contactName = Utils.getContactName(c.getMessageUser());
+        String contactName = ContactsUtils.getContactName(c.getMessageUser());
         String name = contactName.equals("") ? c.getMessageUser() : contactName;
         viewHolder.displayName.setText(name);
         viewHolder.messageText.setText(c.getMessageText());

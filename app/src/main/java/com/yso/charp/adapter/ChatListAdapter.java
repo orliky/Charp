@@ -6,23 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.yso.charp.Interface.ChatItemClickListener;
 import com.yso.charp.R;
-import com.yso.charp.model.ChatMessage;
 import com.yso.charp.model.ChatTitle;
-import com.yso.charp.utils.Utils;
+import com.yso.charp.utils.ContactsUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-/**
- * Created by Admin on 21-Nov-17.
- */
 
 public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
@@ -61,7 +51,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         ChatViewHolder chatViewHolder = (ChatViewHolder) holder;
 
         ChatTitle chatTitle = (ChatTitle) getItem(position);
-        String contactName =  Utils.getContactName(chatTitle.getPhone());
+        String contactName =  ContactsUtils.getContactName(chatTitle.getPhone());
         String name = contactName.equals("") ? chatTitle.getPhone() : contactName;
         chatViewHolder.mName.setText(name);
         chatViewHolder.mLastMessage.setText(chatTitle.getLastMessage());
@@ -86,8 +76,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         ChatViewHolder(View itemView)
         {
             super(itemView);
-            mName = (TextView) itemView.findViewById(R.id.chat_name);
-            mLastMessage = (TextView) itemView.findViewById(R.id.last_message);
+            mName = itemView.findViewById(R.id.chat_name);
+            mLastMessage = itemView.findViewById(R.id.last_message);
             itemView.setOnClickListener(this);
         }
 

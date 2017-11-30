@@ -1,26 +1,19 @@
 package com.yso.charp.service;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
-import android.text.Html;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.yso.charp.R;
-import com.yso.charp.activity.MainActivity;
 import com.yso.charp.model.Notification;
-import com.yso.charp.utils.Utils;
+import com.yso.charp.utils.NotificationUtils;
 
 
 public class FirebaseNotificationService extends Service {
@@ -69,7 +62,7 @@ public class FirebaseNotificationService extends Service {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if(dataSnapshot != null){
                     Notification notification = dataSnapshot.getValue(Notification.class);
-                    Utils.showNotification(mDatabase, firebaseAuth, context, notification,dataSnapshot.getKey());
+                    NotificationUtils.showNotification(mDatabase, firebaseAuth, context, notification,dataSnapshot.getKey());
                 }
             }
 
