@@ -22,7 +22,6 @@ public class FirebaseNotificationService extends Service {
     public FirebaseDatabase mDatabase;
     FirebaseAuth firebaseAuth;
     Context context;
-    static String TAG = "FirebaseService";
 
     @Override
     public void onCreate() {
