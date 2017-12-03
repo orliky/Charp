@@ -35,6 +35,7 @@ import com.yso.charp.R;
 import com.yso.charp.adapter.ChatMessageAdapter;
 import com.yso.charp.mannager.FireBaseManager;
 import com.yso.charp.mannager.PersistenceManager;
+import com.yso.charp.mannager.SQL.MessagesDBHandler;
 import com.yso.charp.model.ChatMessage;
 import com.yso.charp.model.ChatTitle;
 import com.yso.charp.model.User;
@@ -152,6 +153,12 @@ public class ChatFragment extends Fragment implements ImageClickListener {
     }
 
     private void loadMessages() {
+        final MessagesDBHandler db = new MessagesDBHandler(getContext());
+        if(db.getAllParentListItem() == null)
+        {
+            db.addListItem(FireBaseManager.getFirebaseUser().getPhoneNumber());
+        }
+
         FireBaseManager.loadChatMessages(mCurrentUserId, mChatUser, new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -166,6 +173,7 @@ public class ChatFragment extends Fragment implements ImageClickListener {
                         chatMessage.setBitmap(decodedImage);
                     }
                     messagesList.add(chatMessage);
+                    db.addChildListItem(chatMessage);
 //                    if(mChatMap.get(mChatUser) == null) {
 //                        mChatMap.put(mChatUser, messagesList);
 //                    } else {

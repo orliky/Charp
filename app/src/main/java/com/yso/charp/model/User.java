@@ -71,4 +71,10 @@ public class User
     {
         this.UID = UID;
     }
+
+    @Override
+    public String toString()
+    {
+        return "User [name=" + name + "phone=" + phone + ", uid=" + ((UID == null) ? "N/A" : UID) + "]";
+    }
 }

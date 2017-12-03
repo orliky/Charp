@@ -12,58 +12,50 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.yso.charp.Interface.ChatItemClickListener;
-import com.yso.charp.MyApplication;
 import com.yso.charp.R;
 import com.yso.charp.activity.MainActivity;
 import com.yso.charp.adapter.UserListAdapter;
 import com.yso.charp.mannager.FireBaseManager;
 import com.yso.charp.mannager.PersistenceManager;
+import com.yso.charp.mannager.SQL.UsersDBHandler;
 import com.yso.charp.model.User;
 import com.yso.charp.utils.ContactsUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
-@SuppressLint ("ValidFragment")
-public class UserListFragment extends Fragment implements ChatItemClickListener
-{
+@SuppressLint("ValidFragment")
+public class UserListFragment extends Fragment implements ChatItemClickListener {
 
     private RecyclerView mRecyclerView;
     private HashMap<String, User> userList = new HashMap<>();
     private UserListAdapter mAdapter;
     private static UserListFragment mInstance;
 
-    public UserListFragment()
-    {
+    public UserListFragment() {
     }
-    public static UserListFragment getInstance()
-    {
-        if (mInstance == null)
-        {
+
+    public static UserListFragment getInstance() {
+        if (mInstance == null) {
             mInstance = new UserListFragment();
         }
         return mInstance;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_user_list, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
-    {
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         userList = PersistenceManager.getInstance().getUsersMap();
@@ -81,36 +73,33 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
         loadClientUsers();
     }
 
-    private void loadClientUsers()
-    {
+    private void loadClientUsers() {
+        final UsersDBHandler db = new UsersDBHandler(getContext());
+
         FireBaseManager.loadClientUsers(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot)
-            {
+            public void onDataChange(DataSnapshot dataSnapshot) {
                 userList.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren())
-                {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
-//                    if (!user.getPhone().equals(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()))
-//                    {
-                        userList.put(user.getPhone(), user);
-//                    }
+                    userList.put(user.getPhone(), user);
+                    if (db.getUser(user.getPhone()) == null) {
+                        db.addUser(user);
+                    }
                 }
                 PersistenceManager.getInstance().setUsersMap(userList);
                 mAdapter.setItems(userList);
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
+            public void onCancelled(DatabaseError databaseError) {
 
             }
         });
     }
 
     @Override
-    public void onItemClick(String key)
-    {
+    public void onItemClick(String key) {
         Bundle bundle = new Bundle();
         bundle.putString("user_phone", key);
 
