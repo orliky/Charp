@@ -12,40 +12,34 @@ public class MySQLiteHelper extends SQLiteOpenHelper
 {
 
     private static final int DATABASE_VERSION = 1;
-    //    private static final String DATABASE_NAME = "BranchDB";
-    private static final String TABLE_BRANCHES = "branches";
-    private static final String KEY_ID = "id";
+    //    private static final String DATABASE_NAME = "";
+    private static final String TABLE_CLIENT_USERS = "ClientUsers";
     private static final String KEY_NAME = "name";
-    private static final String KEY_ADDRESS = "address";
-    private static final String KEY_MANAGER = "manager";
-    private static final String KEY_LAT = "lat";
-    private static final String KEY_LNG = "lng";
+    private static final String KEY_PHONE = "phone";
+    private static final String KEY_UID = "uid";
 
-    private static final String[] COLUMNS = {KEY_ID, KEY_NAME, KEY_ADDRESS, KEY_MANAGER, KEY_LAT, KEY_LNG};
+    private static final String[] COLUMNS = {KEY_NAME, KEY_PHONE, KEY_UID};
 
     public MySQLiteHelper(Context context)
     {
-        super(context, TABLE_BRANCHES, null, DATABASE_VERSION);
+        super(context, TABLE_CLIENT_USERS, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-//        String CREATE_BRANCH_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_BRANCHES + "("
-//                + KEY_ID + " INTEGER PRIMARY KEY,"
-//                + KEY_NAME + " TEXT NOT NULL,"
-//                + KEY_ADDRESS + " TEXT NOT NULL,"
-//                + KEY_MANAGER + " TEXT NOT NULL,"
-//                + KEY_LAT + " REAL NOT NULL,"
-//                + KEY_LNG + " REAL NOT NULL);";
-//
-//        db.execSQL(CREATE_BRANCH_TABLE);
+        String CREATE_CLIENT_USERS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CLIENT_USERS + "("
+                + KEY_NAME + " TEXT NOT NULL,"
+                + KEY_PHONE + " TEXT NOT NULL,"
+                + KEY_UID + " TEXT NOT NULL);";
+
+        db.execSQL(CREATE_CLIENT_USERS_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_BRANCHES);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CLIENT_USERS);
 
         this.onCreate(db);
     }
