@@ -13,7 +13,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
 
     private static final int DATABASE_VERSION = 1;
     //    private static final String DATABASE_NAME = "";
-    private static final String TABLE_CLIENT_USERS = "ClientUsers";
+    private static final String TABLE_USERS = "users";
     private static final String KEY_NAME = "name";
     private static final String KEY_PHONE = "phone";
     private static final String KEY_UID = "uid";
@@ -22,13 +22,13 @@ public class MySQLiteHelper extends SQLiteOpenHelper
 
     public MySQLiteHelper(Context context)
     {
-        super(context, TABLE_CLIENT_USERS, null, DATABASE_VERSION);
+        super(context, TABLE_USERS, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-        String CREATE_CLIENT_USERS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_CLIENT_USERS + "("
+        String CREATE_CLIENT_USERS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_USERS + "("
                 + KEY_NAME + " TEXT NOT NULL,"
                 + KEY_PHONE + " TEXT NOT NULL,"
                 + KEY_UID + " TEXT NOT NULL);";
@@ -39,7 +39,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CLIENT_USERS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
 
         this.onCreate(db);
     }
