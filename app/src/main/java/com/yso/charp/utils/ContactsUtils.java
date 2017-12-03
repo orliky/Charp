@@ -38,6 +38,26 @@ public abstract class ContactsUtils
         return contactName;
     }
 
+    public static ArrayList<String> getWhatsAppContacts()
+    {
+        Cursor c = MyApplication.getAppContext().getContentResolver().query(
+                ContactsContract.RawContacts.CONTENT_URI,
+                new String[] { ContactsContract.RawContacts.CONTACT_ID, ContactsContract.RawContacts.DISPLAY_NAME_PRIMARY },
+                ContactsContract.RawContacts.ACCOUNT_TYPE + "= ?",
+                new String[] { "com.whatsapp" },
+                null);
+
+        ArrayList<String> myWhatsappContacts = new ArrayList<String>();
+        int contactNameColumn = c.getColumnIndex(ContactsContract.RawContacts.DISPLAY_NAME_PRIMARY);
+        while (c.moveToNext())
+        {
+            // You can also read RawContacts.CONTACT_ID to read the
+            // ContactsContract.Contacts table or any of the other related ones.
+            myWhatsappContacts.add(c.getString(contactNameColumn));
+        }
+        return myWhatsappContacts;
+    }
+
     public static ArrayList<String> getAllContactPhoneNumbers(Context context) {
         String CONTACT_ID = ContactsContract.Contacts._ID;
         String HAS_PHONE_NUMBER = ContactsContract.Contacts.HAS_PHONE_NUMBER;

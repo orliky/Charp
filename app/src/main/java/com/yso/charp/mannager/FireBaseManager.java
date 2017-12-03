@@ -45,6 +45,7 @@ public class FireBaseManager
     private static FirebaseAuth mFirebaseAuth;
     private static FirebaseUser mFirebaseUser;
     private static DatabaseReference mDatabaseReferencem;
+    private static String mFirebaseUserPhone;
 
     public static FirebaseAuth getFirebaseAuth()
     {
@@ -58,6 +59,12 @@ public class FireBaseManager
         return mFirebaseUser;
     }
 
+    public static String getFirebaseUserPhone() {
+        String phone = getFirebaseUser().getPhoneNumber().replace(" ", "");
+        mFirebaseUserPhone = phone;
+        return mFirebaseUserPhone;
+    }
+
     public static DatabaseReference getDatabaseReferencem()
     {
         mDatabaseReferencem = FirebaseDatabase.getInstance().getReference();
@@ -69,18 +76,18 @@ public class FireBaseManager
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(name).build();
         getFirebaseUser().updateProfile(profileUpdates);
 
-        FirebaseDatabase.getInstance().getReference().child(FB_CHILD_USERS).child(getFirebaseUser().getPhoneNumber()).
+        FirebaseDatabase.getInstance().getReference().child(FB_CHILD_USERS).child(getFirebaseUserPhone()).
                 setValue(new User(name,
-                        getFirebaseUser().getPhoneNumber(),
+                        getFirebaseUserPhone(),
                         getFirebaseUser().getUid()));
 
     }
 
     public static void setUser()
     {
-        getDatabaseReferencem().child(FB_CHILD_USERS).child(getFirebaseUser().getPhoneNumber()).
+        getDatabaseReferencem().child(FB_CHILD_USERS).child(getFirebaseUserPhone()).
                 setValue(new User(getFirebaseUser().getDisplayName(),
-                        getFirebaseUser().getPhoneNumber(),
+                        getFirebaseUserPhone(),
                         getFirebaseUser().getUid()));
     }
 
@@ -103,12 +110,12 @@ public class FireBaseManager
 
     public static void loadNotifications(ChildEventListener childEventListener)
     {
-        getDatabaseReferencem().child(FB_CHILD_NOTIFICATION).child(getFirebaseUser().getPhoneNumber()).orderByChild(FB_CHILD_NOTIFICATION_STATUS).equalTo(0).addChildEventListener(childEventListener);
+        getDatabaseReferencem().child(FB_CHILD_NOTIFICATION).child(getFirebaseUserPhone()).orderByChild(FB_CHILD_NOTIFICATION_STATUS).equalTo(0).addChildEventListener(childEventListener);
     }
 
     public static void loadChatList(ValueEventListener valueEventListener)
     {
-        getDatabaseReferencem().child(FB_CHILD_MESSAGES).child(mFirebaseUser.getPhoneNumber()).addValueEventListener(valueEventListener);
+        getDatabaseReferencem().child(FB_CHILD_MESSAGES).child(getFirebaseUserPhone()).addValueEventListener(valueEventListener);
     }
 
     public static void updateChildren(Map map, DatabaseReference.CompletionListener completionListener)
@@ -123,7 +130,7 @@ public class FireBaseManager
 
     public static void setFlagNotificationAsSent(FirebaseDatabase database, FirebaseAuth firebaseAuth, String notification_key) {
         database.getReference().child(FB_CHILD_NOTIFICATION)
-                .child(firebaseAuth.getCurrentUser().getPhoneNumber())
+                .child(getFirebaseUserPhone())
                 .child(notification_key)
                 .child(FB_CHILD_NOTIFICATION_STATUS)
                 .setValue(1);
@@ -133,7 +140,7 @@ public class FireBaseManager
 
     public static void loadClientUsers(ValueEventListener valueEventListener)
     {
-        getDatabaseReferencem().child(FB_CHILD_CLIENT_USERS).child(getFirebaseUser().getPhoneNumber()).addValueEventListener(valueEventListener);
+        getDatabaseReferencem().child(FB_CHILD_CLIENT_USERS).child(getFirebaseUserPhone()).addValueEventListener(valueEventListener);
     }
 
     public static void updateClientUsers()
@@ -148,7 +155,7 @@ public class FireBaseManager
                 for (DataSnapshot snapshot : dataSnapshot.getChildren())
                 {
                     User user = snapshot.getValue(User.class);
-                    if (!user.getPhone().equals(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()))
+                    if (!user.getPhone().equals(getFirebaseUserPhone()))
                     {
                         allUsers.put(user.getPhone(), user);
                     }
@@ -165,7 +172,7 @@ public class FireBaseManager
                     }
                 }
 
-                FirebaseDatabase.getInstance().getReference().child("ClientUsers").child(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()).setValue(clientUsers);
+                FirebaseDatabase.getInstance().getReference().child("ClientUsers").child(getFirebaseUserPhone()).setValue(clientUsers);
                 PersistenceManager.getInstance().setUsersMap(clientUsers);
             }
 

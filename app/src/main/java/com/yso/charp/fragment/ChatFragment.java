@@ -80,7 +80,7 @@ public class ChatFragment extends Fragment implements ImageClickListener {
 
         mRootRef = FireBaseManager.getDatabaseReferencem();
         mFirebaseUser = FireBaseManager.getFirebaseUser();
-        mCurrentUserId = mFirebaseUser.getPhoneNumber();
+        mCurrentUserId = FireBaseManager.getFirebaseUserPhone();
 
         Bundle bundle = this.getArguments();
 
@@ -156,7 +156,7 @@ public class ChatFragment extends Fragment implements ImageClickListener {
         final MessagesDBHandler db = new MessagesDBHandler(getContext());
         if(db.getAllParentListItem() == null)
         {
-            db.addListItem(FireBaseManager.getFirebaseUser().getPhoneNumber());
+            db.addListItem(FireBaseManager.getFirebaseUserPhone());
         }
 
         FireBaseManager.loadChatMessages(mCurrentUserId, mChatUser, new ChildEventListener() {
@@ -173,7 +173,9 @@ public class ChatFragment extends Fragment implements ImageClickListener {
                         chatMessage.setBitmap(decodedImage);
                     }
                     messagesList.add(chatMessage);
-                    db.addChildListItem(chatMessage);
+                    if(db.getChatMessage(dataSnapshot.getKey()) == null) {
+                        db.addChildListItem(dataSnapshot.getKey(), chatMessage);
+                    }
 //                    if(mChatMap.get(mChatUser) == null) {
 //                        mChatMap.put(mChatUser, messagesList);
 //                    } else {
@@ -217,7 +219,7 @@ public class ChatFragment extends Fragment implements ImageClickListener {
 
             DatabaseReference user_message_push = mRootRef.child(FB_CHILD_MESSAGES).child(mCurrentUserId).child(mChatUser).push();
             String push_id = user_message_push.getKey();
-            ChatMessage chatMessage = new ChatMessage(message, mFirebaseUser.getPhoneNumber());
+            ChatMessage chatMessage = new ChatMessage(message, FireBaseManager.getFirebaseUserPhone());
 
             if (mMessageBitmap != null) {
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -264,8 +266,8 @@ public class ChatFragment extends Fragment implements ImageClickListener {
     private void sendNotificationToUser(String userPhone, String message) {
         HashMap users = PersistenceManager.getInstance().getUsersMap();
         User user = (User) users.get(userPhone);
-        if (user != null && !user.getPhone().equals(mFirebaseUser.getPhoneNumber())) {
-            NotificationUtils.sendNotification(user.getPhone(), mFirebaseUser.getPhoneNumber(), message, "chat_view");
+        if (user != null && !user.getPhone().equals(FireBaseManager.getFirebaseUserPhone())) {
+            NotificationUtils.sendNotification(user.getPhone(), FireBaseManager.getFirebaseUserPhone(), message, "chat_view");
         }
     }
 

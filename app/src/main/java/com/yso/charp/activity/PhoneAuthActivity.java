@@ -395,7 +395,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements View.OnClick
             mPhoneNumberField.setText(null);
             mVerificationField.setText(null);
 
-            mTitleText.setText(user.getPhoneNumber());
+            mTitleText.setText(FireBaseManager.getFirebaseUserPhone());
             mStatusText.setText(R.string.signed_in);
             if (user.getDisplayName() == null ||user.getDisplayName().equals(""))
             {

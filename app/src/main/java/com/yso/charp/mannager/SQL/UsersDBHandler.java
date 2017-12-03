@@ -31,8 +31,8 @@ public class UsersDBHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CLIENT_USERS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_USERS + "("
-                + KEY_NAME + " TEXT NOT NULL,"
                 + KEY_PHONE + " TEXT NOT NULL,"
+                + KEY_NAME + " TEXT NOT NULL,"
                 + KEY_UID + " TEXT NOT NULL);";
 
         db.execSQL(CREATE_CLIENT_USERS_TABLE);

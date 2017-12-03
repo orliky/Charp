@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.yso.charp.Interface.ImageClickListener;
 import com.yso.charp.R;
+import com.yso.charp.mannager.FireBaseManager;
 import com.yso.charp.model.ChatMessage;
 import com.yso.charp.utils.ContactsUtils;
 
@@ -129,7 +130,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     private void setGravityByUser(MessageViewHolder viewHolder, ChatMessage c)
     {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        if (c.getMessageUser().equals(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()))
+        if (c.getMessageUser().equals(FireBaseManager.getFirebaseUserPhone()))
         {
             layoutParams.gravity = Gravity.START;
             viewHolder.group.setLayoutParams(layoutParams);
