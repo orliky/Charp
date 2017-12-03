@@ -40,13 +40,13 @@ public class MessagesDBHandler extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
         String CREATE_MAIN_LIST_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_LIST + "("
-                + TABLE_LIST_PHONE + " TEXT)";
+                + TABLE_LIST_PHONE + " TEXT NOT NULL);";
 
         String CREATE_TABLE_CHILD_LIST = "CREATE TABLE IF NOT EXISTS " + TABLE_CHILD_LIST + "("
-                + TABLE_CHILD_LIST_PHONE + " TEXT,"
-                + TABLE_CHILD_LIST_TEXT + " TEXT,"
+                + TABLE_CHILD_LIST_PHONE + " TEXT NOT NULL,"
+                + TABLE_CHILD_LIST_TEXT + " TEXT NOT NULL,"
                 + TABLE_CHILD_LIST_TIME + " INTEGER,"
-                + TABLE_CHILD_LIST_BASE64 + " TEXT);";
+                + TABLE_CHILD_LIST_BASE64 + " TEXT NOT NULL);";
 
         db.execSQL(CREATE_MAIN_LIST_TABLE);
         db.execSQL(CREATE_TABLE_CHILD_LIST);
@@ -77,7 +77,7 @@ public class MessagesDBHandler extends SQLiteOpenHelper {
         values.put(TABLE_CHILD_LIST_TEXT, chatMessage.getMessageText());
         values.put(TABLE_CHILD_LIST_TIME, String.valueOf(chatMessage.getMessageTime()));
         values.put(TABLE_CHILD_LIST_BASE64, chatMessage.getBase64Image());
-        db.insert(TABLE_CHILD_LIST, null, values);
+        db.insert(TABLE_LIST, null, values);
         db.close();
     }
 
@@ -97,7 +97,7 @@ public class MessagesDBHandler extends SQLiteOpenHelper {
         List<ChatMessage> result = null;
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_LIST, null, null, null, null, null, null);
+        Cursor cursor = db.query(TABLE_CHILD_LIST, null, null, null, null, null, null);
 
         while (cursor.moveToNext()) {
             result = new ArrayList<>();
