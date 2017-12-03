@@ -91,10 +91,10 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
                 for (DataSnapshot snapshot : dataSnapshot.getChildren())
                 {
                     User user = snapshot.getValue(User.class);
-                    if (!user.getPhone().equals(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()))
-                    {
+//                    if (!user.getPhone().equals(FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber()))
+//                    {
                         userList.put(user.getPhone(), user);
-                    }
+//                    }
                 }
                 PersistenceManager.getInstance().setUsersMap(userList);
                 mAdapter.setItems(userList);

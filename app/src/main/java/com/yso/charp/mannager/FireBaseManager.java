@@ -39,7 +39,7 @@ public class FireBaseManager
     public static final String FB_CHILD_MESSAGES = "Messages";
     public static final String FB_CHILD_MESSAGES_MESSAGE_TEXT = "messageText";
     public static final String FB_CHILD_MESSAGES_LAST_MESSAGE = "lastMessage";
-    public static final String FB_CHILD_NOTIFICATION = "notifications";
+    public static final String FB_CHILD_NOTIFICATION = "Notifications";
     public static final String FB_CHILD_NOTIFICATION_STATUS = "status";
 
     private static FirebaseAuth mFirebaseAuth;
@@ -54,7 +54,7 @@ public class FireBaseManager
 
     public static FirebaseUser getFirebaseUser()
     {
-        mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        mFirebaseUser = getFirebaseAuth().getCurrentUser();
         return mFirebaseUser;
     }
 
@@ -101,6 +101,11 @@ public class FireBaseManager
         getDatabaseReferencem().child(FB_CHILD_MESSAGES).child(currentUser).child(chatUser).addChildEventListener(childEventListener);
     }
 
+    public static void loadNotifications(ChildEventListener childEventListener)
+    {
+        getDatabaseReferencem().child(FB_CHILD_NOTIFICATION).child(getFirebaseUser().getPhoneNumber()).orderByChild(FB_CHILD_NOTIFICATION_STATUS).equalTo(0).addChildEventListener(childEventListener);
+    }
+
     public static void loadChatList(ValueEventListener valueEventListener)
     {
         getDatabaseReferencem().child(FB_CHILD_MESSAGES).child(mFirebaseUser.getPhoneNumber()).addValueEventListener(valueEventListener);
@@ -123,6 +128,8 @@ public class FireBaseManager
                 .child(FB_CHILD_NOTIFICATION_STATUS)
                 .setValue(1);
     }
+
+
 
     public static void loadClientUsers(ValueEventListener valueEventListener)
     {

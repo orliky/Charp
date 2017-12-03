@@ -238,6 +238,7 @@ public class ChatFragment extends Fragment implements ImageClickListener {
                     }
                     sendNotificationToUser(mChatUser, message);
                     mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
+                    Snackbar.make(getActivity().findViewById(android.R.id.content), "נשלחה הודעה", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
                 }
             });
         } else {

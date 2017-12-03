@@ -12,6 +12,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.yso.charp.mannager.FireBaseManager;
 import com.yso.charp.model.Notification;
 import com.yso.charp.utils.NotificationUtils;
 
@@ -53,10 +54,7 @@ public class FirebaseNotificationService extends Service {
 
     private void setupNotificationListener() {
 
-        mDatabase.getReference().child("notifications")
-                .child(firebaseAuth.getCurrentUser().getPhoneNumber())
-                .orderByChild("status").equalTo(0)
-                .addChildEventListener(new ChildEventListener() {
+       FireBaseManager.loadNotifications(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if(dataSnapshot != null){
