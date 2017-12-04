@@ -13,7 +13,8 @@ import com.yso.charp.model.User;
 import java.util.LinkedList;
 import java.util.List;
 
-public class UsersDBHandler extends SQLiteOpenHelper {
+public class UsersDBHandler extends SQLiteOpenHelper
+{
 
     private static final int DATABASE_VERSION = 1;
 
@@ -24,12 +25,14 @@ public class UsersDBHandler extends SQLiteOpenHelper {
 
     private static final String[] COLUMNS = {KEY_PHONE, KEY_NAME, KEY_UID};
 
-    public UsersDBHandler(Context context) {
+    public UsersDBHandler(Context context)
+    {
         super(context, TABLE_USERS, null, DATABASE_VERSION);
     }
 
     @Override
-    public void onCreate(SQLiteDatabase db) {
+    public void onCreate(SQLiteDatabase db)
+    {
         String CREATE_CLIENT_USERS_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_USERS + "("
                 + KEY_PHONE + " TEXT NOT NULL,"
                 + KEY_NAME + " TEXT NOT NULL,"
@@ -39,14 +42,16 @@ public class UsersDBHandler extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
+    {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
 
         this.onCreate(db);
     }
 
 
-    public void addUser(User user) {
+    public void addUser(User user)
+    {
         Log.d("addUser", user.toString());
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -61,43 +66,45 @@ public class UsersDBHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    public User getUser(String phone) {
-
+    public User getUser(String phone)
+    {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        @SuppressLint("Recycle") Cursor cursor = db.query(TABLE_USERS, COLUMNS, " phone = ?", new String[]{phone}, null, null, null, null);
+        @SuppressLint ("Recycle") Cursor cursor = db.query(TABLE_USERS, COLUMNS, " phone = ?", new String[]{phone}, null, null, null, null);
 
         User user = null;
-        if (cursor != null) {
-            cursor.moveToFirst();
-            if (cursor.moveToFirst()) {
-                user = new User();
-                assert cursor != null;
-                user.setPhone(cursor.getString(0));
-                user.setName(cursor.getString(1));
-                user.setUID(cursor.getString(2));
+        if (cursor.moveToFirst())
+        {
+            user = new User();
+            assert cursor != null;
+            user.setPhone(cursor.getString(0));
+            user.setName(cursor.getString(1));
+            user.setUID(cursor.getString(2));
 
-                Log.d("getUser(" + phone + ")", user.toString());
-            }
-            else {
-                Log.d("getUser(" + phone + ")", "cursor.moveToFirst() = " + cursor.moveToFirst());
-            }
-            Log.d("getUser(" + phone + ")", "user = " + user);
+            Log.d("getUser(" + phone + ")", user.toString());
         }
+        else
+        {
+            Log.d("getUser(" + phone + ")", "cursor.moveToFirst() = " + cursor.moveToFirst());
+        }
+
         return user;
     }
 
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers()
+    {
         List<User> users = new LinkedList<User>();
 
         String query = "SELECT  * FROM " + TABLE_USERS;
 
         SQLiteDatabase db = this.getWritableDatabase();
-        @SuppressLint("Recycle") Cursor cursor = db.rawQuery(query, null);
+        @SuppressLint ("Recycle") Cursor cursor = db.rawQuery(query, null);
 
         User user = null;
-        if (cursor.moveToFirst()) {
-            do {
+        if (cursor.moveToFirst())
+        {
+            do
+            {
                 user = new User();
                 user.setPhone(cursor.getString(0));
                 user.setName(cursor.getString(1));
@@ -112,7 +119,8 @@ public class UsersDBHandler extends SQLiteOpenHelper {
         return users;
     }
 
-    public int updateUser(User user) {
+    public int updateUser(User user)
+    {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -128,7 +136,8 @@ public class UsersDBHandler extends SQLiteOpenHelper {
 
     }
 
-    public void deleteUser(User user) {
+    public void deleteUser(User user)
+    {
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -140,7 +149,8 @@ public class UsersDBHandler extends SQLiteOpenHelper {
 
     }
 
-    public void deleteAllUsers() {
+    public void deleteAllUsers()
+    {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + TABLE_USERS);
         db.close();
