@@ -37,7 +37,6 @@ import com.yso.charp.mannager.FireBaseManager;
 import com.yso.charp.mannager.PersistenceManager;
 import com.yso.charp.mannager.SQL.MessagesDBHandler;
 import com.yso.charp.model.ChatMessage;
-import com.yso.charp.model.ChatTitle;
 import com.yso.charp.model.User;
 import com.yso.charp.utils.NotificationUtils;
 
@@ -187,9 +186,10 @@ public class ChatFragment extends Fragment implements ImageClickListener
                         chatMessage.setBitmap(decodedImage);
                     }
                     messagesList.add(chatMessage);
+                    db.getAllChatList();
                     if (db.getChatMessage(dataSnapshot.getKey()) == null)
                     {
-                        db.addChildListItem(dataSnapshot.getKey(), mChatUser, chatMessage);
+                        db.addChatMessage(dataSnapshot.getKey(), mChatUser, chatMessage);
                     }
                     mAdapter.notifyDataSetChanged();
 

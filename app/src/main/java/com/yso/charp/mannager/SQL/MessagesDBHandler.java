@@ -9,9 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.yso.charp.model.ChatMessage;
-import com.yso.charp.model.User;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -22,10 +21,7 @@ public class MessagesDBHandler extends SQLiteOpenHelper
 {
     private static final int DATABASE_VERSION = 1;
 
-//    private static final String TABLE_LIST = "messages";
-//    private static final String TABLE_LIST_PHONE = "phone";
-
-    private static final String TABLE_CHILD_LIST = "message";
+    private static final String TABLE_MESSAGES = "messages";
     private static final String TABLE_CHILD_LIST_ID = "id";
     private static final String TABLE_CHILD_LIST_FROM = "fromUser";
     private static final String TABLE_CHILD_LIST_PHONE = "phone";
@@ -37,55 +33,35 @@ public class MessagesDBHandler extends SQLiteOpenHelper
 
     public MessagesDBHandler(Context context)
     {
-        super(context, TABLE_CHILD_LIST, null, DATABASE_VERSION);
+        super(context, TABLE_MESSAGES, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-
-//        String CREATE_MAIN_LIST_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_LIST + "("
-//                + TABLE_LIST_PHONE + " TEXT NOT NULL)";
-
-        String CREATE_TABLE_CHILD_LIST = "CREATE TABLE IF NOT EXISTS " + TABLE_CHILD_LIST + "("
+        String CREATE_MESSAGES_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_MESSAGES + "("
                 + TABLE_CHILD_LIST_ID + " TEXT NOT NULL,"
                 + TABLE_CHILD_LIST_FROM + " TEXT NOT NULL,"
                 + TABLE_CHILD_LIST_PHONE + " TEXT NOT NULL,"
-                + TABLE_CHILD_LIST_TEXT + " TEXT NOT NULL,"
+                + TABLE_CHILD_LIST_TEXT + " TEXT,"
                 + TABLE_CHILD_LIST_TIME + " INTEGER,"
-                + TABLE_CHILD_LIST_BASE64 + " TEXT NOT NULL);";
+                + TABLE_CHILD_LIST_BASE64 + " TEXT);";
 
-//        db.execSQL(CREATE_MAIN_LIST_TABLE);
-        db.execSQL(CREATE_TABLE_CHILD_LIST);
+        db.execSQL(CREATE_MESSAGES_TABLE);
     }
 
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
-//        db.execSQL("DROP TABLE IF EXISTS " + TABLE_LIST);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CHILD_LIST);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_MESSAGES);
 
-        onCreate(db);
+        this.onCreate(db);
     }
 
-
-//    public void addListItem(String parentPhone)
-//    {
-//        Log.d("addListItem", parentPhone);
-//
-//        SQLiteDatabase db = this.getWritableDatabase();
-//
-//        ContentValues values = new ContentValues();
-//        values.put(TABLE_LIST_PHONE, parentPhone);
-//
-//        db.insert(TABLE_LIST, null, values);
-//        db.close();
-//    }
-
-    public void addChildListItem(String id, String from, ChatMessage chatMessage)
+    public void addChatMessage(String id, String from, ChatMessage chatMessage)
     {
-        Log.d("addChildListItem", chatMessage.getMessageText());
+        Log.d("addChatMessage", chatMessage.getMessageText());
 
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -97,7 +73,7 @@ public class MessagesDBHandler extends SQLiteOpenHelper
         values.put(TABLE_CHILD_LIST_TIME, String.valueOf(chatMessage.getMessageTime()));
         values.put(TABLE_CHILD_LIST_BASE64, chatMessage.getBase64Image());
 
-        db.insert(TABLE_CHILD_LIST, null, values);
+        db.insert(TABLE_MESSAGES, null, values);
         db.close();
     }
 
@@ -105,7 +81,7 @@ public class MessagesDBHandler extends SQLiteOpenHelper
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        @SuppressLint ("Recycle") Cursor cursor = db.query(TABLE_CHILD_LIST, COLUMNS, " id = ?", new String[]{id}, null, null, null, null);
+        @SuppressLint ("Recycle") Cursor cursor = db.query(TABLE_MESSAGES, COLUMNS, " id = ?", new String[]{id}, null, null, null, null);
 
         ChatMessage chatMessage = null;
         if (cursor.moveToFirst())
@@ -122,43 +98,36 @@ public class MessagesDBHandler extends SQLiteOpenHelper
         return chatMessage;
     }
 
-//    public void deleteParentItem(String parentPhone)
-//    {
-//        SQLiteDatabase db = this.getWritableDatabase();
-//        db.delete(TABLE_LIST, TABLE_LIST_PHONE + " = ?", new String[]{parentPhone});
-//        db.close();
-//    }
-
     public void deleteChildItem(String phone)
     {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_CHILD_LIST, TABLE_CHILD_LIST_PHONE + " = ?", new String[]{phone});
+        db.delete(TABLE_MESSAGES, TABLE_CHILD_LIST_PHONE + " = ?", new String[]{phone});
         db.close();
     }
 
     public List<ChatMessage> getAllChatList()
     {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query(TABLE_CHILD_LIST, null, null, null, null, null, null);
+        List<ChatMessage> chatMessages = new LinkedList<>();
 
-        List<ChatMessage> result = null;
+        String query = "SELECT  * FROM " + TABLE_MESSAGES;
+        SQLiteDatabase db = this.getWritableDatabase();
+        @SuppressLint ("Recycle") Cursor cursor = db.rawQuery(query, null);
+
+        ChatMessage chatMessage  = null;
         if (cursor.moveToFirst())
         {
             do
             {
-                result = new ArrayList<>();
-                ChatMessage chatMessage = new ChatMessage();
+                chatMessage = new ChatMessage();
                 chatMessage.setMessageUser(getStringByColumName(cursor, TABLE_CHILD_LIST_PHONE));
                 chatMessage.setMessageText(getStringByColumName(cursor, TABLE_CHILD_LIST_TEXT));
                 chatMessage.setMessageTime(getLongByColumName(cursor, TABLE_CHILD_LIST_TIME));
                 chatMessage.setBase64Image(getStringByColumName(cursor, TABLE_CHILD_LIST_BASE64));
 
-                result.add(chatMessage);
+                chatMessages.add(chatMessage);
             } while (cursor.moveToNext());
         }
-        cursor.close();
-        db.close();
-        return result;
+        return chatMessages;
     }
 
     private int getIntByColumName(Cursor cursor, String tableColumn)

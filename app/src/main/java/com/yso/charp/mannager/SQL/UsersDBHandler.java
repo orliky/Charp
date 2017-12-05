@@ -62,7 +62,6 @@ public class UsersDBHandler extends SQLiteOpenHelper
         values.put(KEY_UID, user.getUID());
 
         db.insert(TABLE_USERS, null, values);
-
         db.close();
     }
 
@@ -93,10 +92,9 @@ public class UsersDBHandler extends SQLiteOpenHelper
 
     public List<User> getAllUsers()
     {
-        List<User> users = new LinkedList<User>();
+        List<User> users = new LinkedList<>();
 
         String query = "SELECT  * FROM " + TABLE_USERS;
-
         SQLiteDatabase db = this.getWritableDatabase();
         @SuppressLint ("Recycle") Cursor cursor = db.rawQuery(query, null);
 
