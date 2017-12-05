@@ -168,10 +168,6 @@ public class ChatFragment extends Fragment implements ImageClickListener
     private void loadMessages()
     {
         final MessagesDBHandler db = new MessagesDBHandler(getContext());
-        if (db.getAllChatList() == null)
-        {
-            db.addListItem(FireBaseManager.getFirebaseUserPhone());
-        }
 
         FireBaseManager.loadChatMessages(mCurrentUserId, mChatUser, new ChildEventListener()
         {
@@ -193,7 +189,7 @@ public class ChatFragment extends Fragment implements ImageClickListener
                     messagesList.add(chatMessage);
                     if (db.getChatMessage(dataSnapshot.getKey()) == null)
                     {
-                        db.addChildListItem(dataSnapshot.getKey(), chatMessage);
+                        db.addChildListItem(dataSnapshot.getKey(), mChatUser, chatMessage);
                     }
                     mAdapter.notifyDataSetChanged();
 
