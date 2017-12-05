@@ -10,6 +10,24 @@ import java.util.Date;
 
 public class ChatMessage {
 
+    public static final String TAG = ChatMessage.class.getSimpleName();
+    public static final String TABLE = "ChatMessage";
+    // Labels Table Columns names
+    public static final String KEY_ID = "id";
+    public static final String KEY_FROM = "fromUser";
+    public static final String KEY_PHONE = "phone";
+    public static final String KEY_TEXT = "messageText";
+    public static final String KEY_TIME = "messageTime";
+    public static final String KEY_BASE64 = "mBase64Image";
+    //String[] Columns
+    public static final String[] COLUMNS =
+            {KEY_ID,
+                    KEY_FROM,
+                    KEY_PHONE,
+                    KEY_TEXT,
+                    KEY_TIME,
+                    KEY_BASE64};
+
     private String messageText;
     private String messageUser;
     private long messageTime;

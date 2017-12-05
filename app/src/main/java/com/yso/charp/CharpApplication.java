@@ -4,13 +4,15 @@ import android.app.Application;
 import android.content.Context;
 
 import com.yso.charp.mannager.PersistenceManager;
+import com.yso.charp.mannager.dataBase.DBHelper;
+import com.yso.charp.mannager.dataBase.DatabaseManager;
 
 
 /**
  * Created by Admin on 16-Oct-17.
  */
 
-public class MyApplication extends Application
+public class CharpApplication extends Application
 {
 
     private static Context msApplicationContext;
@@ -22,7 +24,7 @@ public class MyApplication extends Application
 
         msApplicationContext = getApplicationContext();
         PersistenceManager.initInstance(msApplicationContext);
-
+        DatabaseManager.initializeInstance(new DBHelper());
     }
 
     public static Context getAppContext()

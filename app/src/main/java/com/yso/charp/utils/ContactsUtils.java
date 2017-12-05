@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
 
-import com.yso.charp.MyApplication;
+import com.yso.charp.CharpApplication;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ public abstract class ContactsUtils
         String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
 
         String contactName = "";
-        Cursor cursor = MyApplication.getAppContext().getContentResolver().query(uri, projection, null, null, null);
+        Cursor cursor = CharpApplication.getAppContext().getContentResolver().query(uri, projection, null, null, null);
 
         if (cursor != null)
         {
@@ -40,7 +40,7 @@ public abstract class ContactsUtils
 
     public static ArrayList<String> getWhatsAppContacts()
     {
-        Cursor c = MyApplication.getAppContext().getContentResolver().query(
+        Cursor c = CharpApplication.getAppContext().getContentResolver().query(
                 ContactsContract.RawContacts.CONTENT_URI,
                 new String[] { ContactsContract.RawContacts.CONTACT_ID, ContactsContract.RawContacts.DISPLAY_NAME_PRIMARY },
                 ContactsContract.RawContacts.ACCOUNT_TYPE + "= ?",

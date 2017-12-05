@@ -25,7 +25,6 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -35,7 +34,7 @@ import com.yso.charp.R;
 import com.yso.charp.adapter.ChatMessageAdapter;
 import com.yso.charp.mannager.FireBaseManager;
 import com.yso.charp.mannager.PersistenceManager;
-import com.yso.charp.mannager.SQL.MessagesDBHandler;
+import com.yso.charp.mannager.dataBase.ChatMessageRepo;
 import com.yso.charp.model.ChatMessage;
 import com.yso.charp.model.User;
 import com.yso.charp.utils.NotificationUtils;
@@ -60,12 +59,12 @@ public class ChatFragment extends Fragment implements ImageClickListener
     private EditText input;
     private String mCurrentUserId, mChatUser;
     private DatabaseReference mRootRef;
-    private FirebaseUser mFirebaseUser;
     private List<ChatMessage> messagesList = new ArrayList<>();
     private ChatMessageAdapter mAdapter;
     private Bitmap mMessageBitmap;
     private ImageView mImageView;
     private HashMap<String, List<ChatMessage>> mChatMap = new HashMap<>();
+    private ChatMessageRepo mChatMessageRepo;
 
     public ChatFragment()
     {
@@ -78,10 +77,11 @@ public class ChatFragment extends Fragment implements ImageClickListener
     {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
+        mChatMessageRepo = new ChatMessageRepo();
+
         input = view.findViewById(R.id.input);
 
         mRootRef = FireBaseManager.getDatabaseReferencem();
-        mFirebaseUser = FireBaseManager.getFirebaseUser();
         mCurrentUserId = FireBaseManager.getFirebaseUserPhone();
 
         Bundle bundle = this.getArguments();
@@ -92,10 +92,6 @@ public class ChatFragment extends Fragment implements ImageClickListener
         }
 
         mRecyclerView = view.findViewById(R.id.list_of_messages);
-
-        //        mChatMap = PersistenceManager.getInstance().getChatMap();
-        //        messagesList = mChatMap.get(mChatUser) == null ? new ArrayList<ChatMessage>() : mChatMap.get(mChatUser);
-
         mAdapter = new ChatMessageAdapter(getContext(), messagesList);
 
         loadMessages();
@@ -166,8 +162,6 @@ public class ChatFragment extends Fragment implements ImageClickListener
 
     private void loadMessages()
     {
-        final MessagesDBHandler db = new MessagesDBHandler(getContext());
-
         FireBaseManager.loadChatMessages(mCurrentUserId, mChatUser, new ChildEventListener()
         {
             @Override
@@ -185,15 +179,15 @@ public class ChatFragment extends Fragment implements ImageClickListener
 
                         chatMessage.setBitmap(decodedImage);
                     }
-                    messagesList.add(chatMessage);
-                    db.getAllChatList();
-                    if (db.getChatMessage(dataSnapshot.getKey()) == null)
-                    {
-                        db.addChatMessage(dataSnapshot.getKey(), mChatUser, chatMessage);
-                    }
-                    mAdapter.notifyDataSetChanged();
 
+                    messagesList.add(chatMessage);
+                    mAdapter.notifyDataSetChanged();
                     mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
+
+                    if (mChatMessageRepo.getById(dataSnapshot.getKey()) == null)
+                    {
+                        mChatMessageRepo.insert(dataSnapshot.getKey(), mChatUser, chatMessage);
+                    }
                 }
             }
 

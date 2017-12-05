@@ -2,8 +2,6 @@ package com.yso.charp.mannager;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
-import android.view.View;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -18,14 +16,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.yso.charp.Interface.SignOutListener;
-import com.yso.charp.MyApplication;
-import com.yso.charp.model.ChatTitle;
+import com.yso.charp.CharpApplication;
 import com.yso.charp.model.User;
 import com.yso.charp.utils.ContactsUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -161,7 +157,7 @@ public class FireBaseManager
                     }
                 }
 
-                ArrayList contacts = ContactsUtils.getAllContactPhoneNumbers(MyApplication.getAppContext());
+                ArrayList contacts = ContactsUtils.getAllContactPhoneNumbers(CharpApplication.getAppContext());
 
                 for (Object phone : contacts)
                 {

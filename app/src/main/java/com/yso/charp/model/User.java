@@ -6,6 +6,15 @@ package com.yso.charp.model;
 
 public class User
 {
+    public static final String TAG = User.class.getSimpleName();
+    public static final String TABLE = "User";
+    // Labels Table Columns names
+    public static final String KEY_PHONE = "phone";
+    public static final String KEY_NAME = "name";
+    public static final String KEY_UID = "uid";
+    //String[] Columns
+    public static final String[] COLUMNS = {KEY_PHONE, KEY_NAME, KEY_UID};
+
     private String name;
     private String phone;
     private String created;

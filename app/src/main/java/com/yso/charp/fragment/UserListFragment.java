@@ -21,7 +21,7 @@ import com.yso.charp.activity.MainActivity;
 import com.yso.charp.adapter.UserListAdapter;
 import com.yso.charp.mannager.FireBaseManager;
 import com.yso.charp.mannager.PersistenceManager;
-import com.yso.charp.mannager.SQL.UsersDBHandler;
+import com.yso.charp.mannager.dataBase.UserRepo;
 import com.yso.charp.model.User;
 import com.yso.charp.utils.ContactsUtils;
 
@@ -37,7 +37,9 @@ public class UserListFragment extends Fragment implements ChatItemClickListener 
     private RecyclerView mRecyclerView;
     private HashMap<String, User> userList = new HashMap<>();
     private UserListAdapter mAdapter;
+    @SuppressLint("StaticFieldLeak")
     private static UserListFragment mInstance;
+    private UserRepo mUserRepo;
 
     public UserListFragment() {
     }
@@ -58,6 +60,8 @@ public class UserListFragment extends Fragment implements ChatItemClickListener 
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        mUserRepo = new UserRepo();
+
         userList = PersistenceManager.getInstance().getUsersMap();
 
         mAdapter = new UserListAdapter(getContext(), userList);
@@ -74,8 +78,6 @@ public class UserListFragment extends Fragment implements ChatItemClickListener 
     }
 
     private void loadClientUsers() {
-        final UsersDBHandler db = new UsersDBHandler(getContext());
-
         FireBaseManager.loadClientUsers(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -83,8 +85,8 @@ public class UserListFragment extends Fragment implements ChatItemClickListener 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     User user = snapshot.getValue(User.class);
                     userList.put(user.getPhone(), user);
-                    if (db.getUser(user.getPhone()) == null) {
-                        db.addUser(user);
+                    if (mUserRepo.getByPhone(user.getPhone()) == null) {
+                        mUserRepo.insert(user);
                     }
                 }
                 PersistenceManager.getInstance().setUsersMap(userList);
