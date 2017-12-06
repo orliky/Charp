@@ -42,6 +42,8 @@ import com.yso.charp.utils.NotificationUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +105,7 @@ public class ChatFragment extends Fragment implements ImageClickListener
         }
 
         mRecyclerView = view.findViewById(R.id.list_of_messages);
-//        messagesList = mChatMessageRepo.getByChat(mCurrentUserId, mChatUser);
+        initListFromDB();
         mAdapter = new ChatMessageAdapter(getContext(), messagesList);
 
         loadMessages();
@@ -128,6 +130,23 @@ public class ChatFragment extends Fragment implements ImageClickListener
             }
         });
         return view;
+    }
+
+    private void initListFromDB()
+    {
+        messagesList.addAll(mChatMessageRepo.getByChat(mCurrentUserId, mChatUser));
+        messagesList.addAll(mChatMessageRepo.getByChat(mChatUser, mCurrentUserId));
+        Collections.sort(messagesList, new Comparator<ChatMessage>()
+        {
+            @Override
+            public int compare(ChatMessage s1, ChatMessage s2)
+            {
+                return Long.compare(s1.getMessageTime(), s2.getMessageTime());
+            }
+        });
+        for(ChatMessage chatMessage: messagesList){
+            getImage(chatMessage);
+        }
     }
 
     @Override
@@ -172,33 +191,28 @@ public class ChatFragment extends Fragment implements ImageClickListener
         }
     }
 
-    private void loadMessages() {
+    private void loadMessages()
+    {
         messagesList.clear();
-        FireBaseManager.loadChatMessages(mCurrentUserId, mChatUser, new ChildEventListener() {
+        FireBaseManager.loadChatMessages(mCurrentUserId, mChatUser, new ChildEventListener()
+        {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s)
             {
                 if (!dataSnapshot.getKey().equals(FB_CHILD_MESSAGES_LAST_MESSAGE))
                 {
-//                    if (mChatMessageRepo.getById(dataSnapshot.getKey()) == null)
-//                    {
-                        ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
+                    ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
+                    assert chatMessage != null;
+                    getImage(chatMessage);
 
-                        assert chatMessage != null;
-                        if (chatMessage.getBase64Image() != null && !chatMessage.getBase64Image().equals(""))
-                        {
-                            byte[] imageBytes = Base64.decode(chatMessage.getBase64Image(), Base64.DEFAULT);
-                            Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                    messagesList.add(chatMessage);
+                    mAdapter.notifyDataSetChanged();
+                    mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
 
-                            chatMessage.setBitmap(decodedImage);
-                        }
-
-                        messagesList.add(chatMessage);
-                        mAdapter.notifyDataSetChanged();
-                        mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
-
-//                        mChatMessageRepo.insert(dataSnapshot.getKey(), mChatUser, chatMessage);
-//                    }
+                    if (mChatMessageRepo.getById(dataSnapshot.getKey()) == null)
+                    {
+                        mChatMessageRepo.insert(dataSnapshot.getKey(), chatMessage.getMessageUser(), chatMessage);
+                    }
                 }
             }
 
@@ -226,6 +240,17 @@ public class ChatFragment extends Fragment implements ImageClickListener
 
             }
         });
+    }
+
+    private void getImage(ChatMessage chatMessage)
+    {
+        if (chatMessage.getBase64Image() != null && !chatMessage.getBase64Image().equals(""))
+        {
+            byte[] imageBytes = Base64.decode(chatMessage.getBase64Image(), Base64.DEFAULT);
+            Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+
+            chatMessage.setBitmap(decodedImage);
+        }
     }
 
     private void sendMessage()
