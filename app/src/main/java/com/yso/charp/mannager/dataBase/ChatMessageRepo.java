@@ -24,7 +24,7 @@ public class ChatMessageRepo {
 
     }
 
-    public static String createTable(){
+    static String createTable(){
         return "CREATE TABLE IF NOT EXISTS " + ChatMessage.TABLE + "("
                 + ChatMessage.KEY_ID + " TEXT NOT NULL,"
                 + ChatMessage.KEY_FROM + " TEXT NOT NULL,"
@@ -80,6 +80,35 @@ public class ChatMessageRepo {
         String query = "SELECT  * FROM " + ChatMessage.TABLE;
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
         @SuppressLint ("Recycle") Cursor cursor = db.rawQuery(query, null);
+
+        ChatMessage chatMessage  = null;
+        if (cursor.moveToFirst())
+        {
+            do
+            {
+                chatMessage = new ChatMessage();
+                chatMessage.setMessageUser(DatabaseManager.getStringByColumName(cursor, ChatMessage.KEY_PHONE));
+                chatMessage.setMessageText(DatabaseManager.getStringByColumName(cursor, ChatMessage.KEY_TEXT));
+                chatMessage.setMessageTime(DatabaseManager.getLongByColumName(cursor, ChatMessage.KEY_TIME));
+                chatMessage.setBase64Image(DatabaseManager.getStringByColumName(cursor, ChatMessage.KEY_BASE64));
+
+                chatMessages.add(chatMessage);
+            } while (cursor.moveToNext());
+        }
+        return chatMessages;
+    }
+
+    public List<ChatMessage> getByChat(String currentUser, String otherUser)
+    {
+        List<ChatMessage> chatMessages = new LinkedList<>();
+        SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
+        Cursor cursor = db.query(ChatMessage.TABLE,
+                ChatMessage.COLUMNS,
+                ChatMessage.KEY_PHONE +"=?" +" AND " + ChatMessage.KEY_FROM +"=?",
+                new String[] {currentUser, otherUser },
+                null, null, null);
+//        String query = "SELECT  * FROM " + ChatMessage.TABLE;
+//        @SuppressLint ("Recycle") Cursor cursor = db.rawQuery(query, null);
 
         ChatMessage chatMessage  = null;
         if (cursor.moveToFirst())

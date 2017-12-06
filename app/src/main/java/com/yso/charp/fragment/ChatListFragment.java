@@ -2,12 +2,10 @@ package com.yso.charp.fragment;
 
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -27,8 +25,10 @@ import com.yso.charp.Interface.ChatItemClickListener;
 import com.yso.charp.R;
 import com.yso.charp.activity.MainActivity;
 import com.yso.charp.adapter.ChatListAdapter;
+import com.yso.charp.adapter.ChatMessageAdapter;
 import com.yso.charp.mannager.FireBaseManager;
 import com.yso.charp.mannager.PersistenceManager;
+import com.yso.charp.mannager.dataBase.ChatMessageRepo;
 import com.yso.charp.model.ChatTitle;
 import com.yso.charp.utils.ContactsUtils;
 
@@ -44,10 +44,11 @@ import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_MESSAGES_MESSAGE_T
 public class ChatListFragment extends Fragment implements ChatItemClickListener
 {
 
-    private RecyclerView mRecyclerView;
     private HashMap<String, ChatTitle> chatList = new HashMap<>();
     private ChatListAdapter mAdapter;
     private ProgressBar mProgressBar;
+    private HashMap<String, ChatFragment> mChatFragments = new HashMap<>();
+    @SuppressLint ("StaticFieldLeak")
     private static ChatListFragment mInstance;
 
     public ChatListFragment()
@@ -78,14 +79,14 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
         chatList = PersistenceManager.getInstance().getChatsMap();
 
         mAdapter = new ChatListAdapter(getContext(), chatList);
-        mRecyclerView = view.findViewById(R.id.list_of_chats);
+        RecyclerView recyclerView = view.findViewById(R.id.list_of_chats);
 
         mAdapter.setClickListener(this);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setAdapter(mAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(mAdapter);
 
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), new LinearLayoutManager(getContext()).getOrientation());
-        mRecyclerView.addItemDecoration(dividerItemDecoration);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), new LinearLayoutManager(getContext()).getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         mProgressBar = view.findViewById(R.id.chat_list_progress);
 
@@ -159,14 +160,14 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
     {
         PersistenceManager.getInstance().setContactPhoneNumbers(ContactsUtils.getAllContactPhoneNumbers(getActivity()));
         HashMap users = PersistenceManager.getInstance().getUsersMap();
-        if (users.get(key) == null)
-        {
-            showNewUserDialog(key);
-        }
-        else
-        {
+//        if (users.get(key) == null)
+//        {
+//            showNewUserDialog(key);
+//        }
+//        else
+//        {
             goToChatFragment(key);
-        }
+//        }
     }
 
     private void goToChatFragment(String key)
@@ -174,8 +175,8 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
         Bundle bundle = new Bundle();
         bundle.putString("user_phone", key);
 
-        ((MainActivity) getActivity()).addChatFragment(bundle);
-        getActivity().setTitle("Charp - " + ContactsUtils.getContactName(key));
+        ((MainActivity) getActivity()).goToChatFragment(bundle);
+//        getActivity().setTitle("Charp - " + ContactsUtils.getContactName(key));
     }
 
     private void showNewUserDialog(final String key)

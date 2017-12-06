@@ -105,9 +105,7 @@ public class UserListFragment extends Fragment implements ChatItemClickListener 
         Bundle bundle = new Bundle();
         bundle.putString("user_phone", key);
 
-        ((MainActivity) getActivity()).addChatFragment(bundle);
-        getActivity().setTitle("Charp - " + ContactsUtils.getContactName(key));
+        ((MainActivity) getActivity()).goToChatFragment(bundle);
+//        getActivity().setTitle("Charp - " + ContactsUtils.getContactName(key));
     }
-
-
 }

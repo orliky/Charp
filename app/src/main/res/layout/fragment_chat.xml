@@ -3,7 +3,8 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#33CCCCCC">
+                android:background="#F5F2F2">
+    <!--"#33CCCCCC"-->
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list_of_messages"
@@ -36,7 +37,6 @@
         android:clickable="true"
         android:src="@drawable/send"
         android:tint="@android:color/white"
-
         app:fabSize="mini"/>
 
     <!--android:backgroundTint="@color/authui_colorPrimaryDark"-->
@@ -47,17 +47,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toStartOf="@id/fab"
+        android:layout_toEndOf="@id/message_choose_image"
         android:layout_alignParentBottom="true"
         android:orientation="horizontal"
         android:layout_below="@+id/image_input">
 
-        <ImageButton
-            android:id="@+id/message_choose_image"
-            style="?android:buttonBarButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_height="35dp"
-            android:src="@drawable/choose_image_icon"/>
+
 
         <android.support.design.widget.TextInputLayout
             android:layout_weight="1"
@@ -72,7 +67,8 @@
             <EditText
                 android:id="@+id/input"
                 android:layout_width="match_parent"
-                android:layout_height="35dp"
+                android:layout_height="wrap_content"
+                android:minHeight="35dp"
                 android:layout_marginBottom="10dp"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/input_bg"
@@ -83,4 +79,16 @@
         </android.support.design.widget.TextInputLayout>
 
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/message_choose_image"
+        style="?android:buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="16dp"
+        android:layout_toStartOf="@id/image_input"
+        android:layout_gravity="center_vertical"
+        android:layout_height="35dp"
+        android:src="@drawable/choose_image_icon"/>
 </RelativeLayout>

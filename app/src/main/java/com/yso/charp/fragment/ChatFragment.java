@@ -65,10 +65,21 @@ public class ChatFragment extends Fragment implements ImageClickListener
     private ImageView mImageView;
     private HashMap<String, List<ChatMessage>> mChatMap = new HashMap<>();
     private ChatMessageRepo mChatMessageRepo;
+    @SuppressLint ("StaticFieldLeak")
+    private static ChatFragment mInstance;
 
     public ChatFragment()
     {
 
+    }
+
+    public static ChatFragment getInstance()
+    {
+        if (mInstance == null)
+        {
+            mInstance = new ChatFragment();
+        }
+        return mInstance;
     }
 
     @SuppressLint ("NewApi")
@@ -92,6 +103,7 @@ public class ChatFragment extends Fragment implements ImageClickListener
         }
 
         mRecyclerView = view.findViewById(R.id.list_of_messages);
+//        messagesList = mChatMessageRepo.getByChat(mCurrentUserId, mChatUser);
         mAdapter = new ChatMessageAdapter(getContext(), messagesList);
 
         loadMessages();
@@ -160,34 +172,33 @@ public class ChatFragment extends Fragment implements ImageClickListener
         }
     }
 
-    private void loadMessages()
-    {
-        FireBaseManager.loadChatMessages(mCurrentUserId, mChatUser, new ChildEventListener()
-        {
+    private void loadMessages() {
+        messagesList.clear();
+        FireBaseManager.loadChatMessages(mCurrentUserId, mChatUser, new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s)
             {
                 if (!dataSnapshot.getKey().equals(FB_CHILD_MESSAGES_LAST_MESSAGE))
                 {
-                    ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
+//                    if (mChatMessageRepo.getById(dataSnapshot.getKey()) == null)
+//                    {
+                        ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
 
-                    assert chatMessage != null;
-                    if (chatMessage.getBase64Image() != null && !chatMessage.getBase64Image().equals(""))
-                    {
-                        byte[] imageBytes = Base64.decode(chatMessage.getBase64Image(), Base64.DEFAULT);
-                        Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                        assert chatMessage != null;
+                        if (chatMessage.getBase64Image() != null && !chatMessage.getBase64Image().equals(""))
+                        {
+                            byte[] imageBytes = Base64.decode(chatMessage.getBase64Image(), Base64.DEFAULT);
+                            Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
 
-                        chatMessage.setBitmap(decodedImage);
-                    }
+                            chatMessage.setBitmap(decodedImage);
+                        }
 
-                    messagesList.add(chatMessage);
-                    mAdapter.notifyDataSetChanged();
-                    mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
+                        messagesList.add(chatMessage);
+                        mAdapter.notifyDataSetChanged();
+                        mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
 
-                    if (mChatMessageRepo.getById(dataSnapshot.getKey()) == null)
-                    {
-                        mChatMessageRepo.insert(dataSnapshot.getKey(), mChatUser, chatMessage);
-                    }
+//                        mChatMessageRepo.insert(dataSnapshot.getKey(), mChatUser, chatMessage);
+//                    }
                 }
             }
 
