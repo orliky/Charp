@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.yso.charp.Interface.SignOutListener;
 import com.yso.charp.R;
 import com.yso.charp.fragment.ChatFragment;
+import com.yso.charp.fragment.ChatListFragment;
 import com.yso.charp.fragment.MainFragment;
 import com.yso.charp.mannager.FireBaseManager;
 import com.yso.charp.receiver.MyContentObserver;
@@ -164,6 +165,13 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        ChatListFragment.getInstance().refreshAdapter();
     }
 
     @Override

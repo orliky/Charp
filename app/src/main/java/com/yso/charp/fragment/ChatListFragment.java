@@ -160,14 +160,14 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
     {
         PersistenceManager.getInstance().setContactPhoneNumbers(ContactsUtils.getAllContactPhoneNumbers(getActivity()));
         HashMap users = PersistenceManager.getInstance().getUsersMap();
-//        if (users.get(key) == null)
-//        {
-//            showNewUserDialog(key);
-//        }
-//        else
-//        {
+        if (users.get(key) == null)
+        {
+            showNewUserDialog(key);
+        }
+        else
+        {
             goToChatFragment(key);
-//        }
+        }
     }
 
     private void goToChatFragment(String key)
@@ -208,5 +208,11 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
                 dialog.dismiss();
             }
         }).show();
+    }
+
+    public void refreshAdapter() {
+        if(mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+        }
     }
 }

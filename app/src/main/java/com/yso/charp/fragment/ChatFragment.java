@@ -202,6 +202,7 @@ public class ChatFragment extends Fragment implements ImageClickListener
                 if (!dataSnapshot.getKey().equals(FB_CHILD_MESSAGES_LAST_MESSAGE))
                 {
                     ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
+
                     assert chatMessage != null;
                     getImage(chatMessage);
 

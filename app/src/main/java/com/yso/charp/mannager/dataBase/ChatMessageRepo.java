@@ -24,7 +24,7 @@ public class ChatMessageRepo {
 
     }
 
-    static String createTable(){
+    static String createTable() {
         return "CREATE TABLE IF NOT EXISTS " + ChatMessage.TABLE + "("
                 + ChatMessage.KEY_ID + " TEXT NOT NULL,"
                 + ChatMessage.KEY_FROM + " TEXT NOT NULL,"
@@ -51,19 +51,17 @@ public class ChatMessageRepo {
 
     public void delete() {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-        db.delete(ChatMessage.TABLE,null,null);
+        db.delete(ChatMessage.TABLE, null, null);
         DatabaseManager.getInstance().closeDatabase();
     }
 
-    public ChatMessage getById(String id)
-    {
+    public ChatMessage getById(String id) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
         @SuppressLint("Recycle") Cursor cursor = db.query(ChatMessage.TABLE, ChatMessage.COLUMNS, " id = ?", new String[]{id}, null, null, null, null);
 
         ChatMessage chatMessage = null;
-        if (cursor.moveToFirst())
-        {
+        if (cursor.moveToFirst()) {
             chatMessage = new ChatMessage();
             chatMessage.setMessageUser(DatabaseManager.getStringByColumName(cursor, ChatMessage.KEY_PHONE));
             chatMessage.setMessageText(DatabaseManager.getStringByColumName(cursor, ChatMessage.KEY_TEXT));
@@ -73,19 +71,16 @@ public class ChatMessageRepo {
         return chatMessage;
     }
 
-    public List<ChatMessage> getAll()
-    {
+    public List<ChatMessage> getAll() {
         List<ChatMessage> chatMessages = new LinkedList<>();
 
         String query = "SELECT  * FROM " + ChatMessage.TABLE;
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
-        @SuppressLint ("Recycle") Cursor cursor = db.rawQuery(query, null);
+        @SuppressLint("Recycle") Cursor cursor = db.rawQuery(query, null);
 
-        ChatMessage chatMessage  = null;
-        if (cursor.moveToFirst())
-        {
-            do
-            {
+        ChatMessage chatMessage = null;
+        if (cursor.moveToFirst()) {
+            do {
                 chatMessage = new ChatMessage();
                 chatMessage.setMessageUser(DatabaseManager.getStringByColumName(cursor, ChatMessage.KEY_PHONE));
                 chatMessage.setMessageText(DatabaseManager.getStringByColumName(cursor, ChatMessage.KEY_TEXT));
@@ -98,23 +93,18 @@ public class ChatMessageRepo {
         return chatMessages;
     }
 
-    public List<ChatMessage> getByChat(String currentUser, String otherUser)
-    {
+    public List<ChatMessage> getByChat(String currentUser, String otherUser) {
         List<ChatMessage> chatMessages = new LinkedList<>();
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
         Cursor cursor = db.query(ChatMessage.TABLE,
                 ChatMessage.COLUMNS,
-                ChatMessage.KEY_PHONE +"=?" +" AND " + ChatMessage.KEY_FROM +"=?",
-                new String[] {currentUser, otherUser },
+                ChatMessage.KEY_PHONE + "=?" + " AND " + ChatMessage.KEY_FROM + "=?",
+                new String[]{currentUser, otherUser},
                 null, null, null);
-//        String query = "SELECT  * FROM " + ChatMessage.TABLE;
-//        @SuppressLint ("Recycle") Cursor cursor = db.rawQuery(query, null);
 
-        ChatMessage chatMessage  = null;
-        if (cursor.moveToFirst())
-        {
-            do
-            {
+        ChatMessage chatMessage = null;
+        if (cursor.moveToFirst()) {
+            do {
                 chatMessage = new ChatMessage();
                 chatMessage.setMessageUser(DatabaseManager.getStringByColumName(cursor, ChatMessage.KEY_PHONE));
                 chatMessage.setMessageText(DatabaseManager.getStringByColumName(cursor, ChatMessage.KEY_TEXT));

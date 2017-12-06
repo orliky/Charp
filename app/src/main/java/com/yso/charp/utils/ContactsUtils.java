@@ -38,6 +38,27 @@ public abstract class ContactsUtils
         return contactName;
     }
 
+    public static String getContactNumber(final String phoneNumber)
+    {
+        Uri uri = Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(phoneNumber));
+
+        String[] projection = new String[]{ContactsContract.PhoneLookup.NUMBER};
+
+        String contactName = "";
+        Cursor cursor = CharpApplication.getAppContext().getContentResolver().query(uri, projection, null, null, null);
+
+        if (cursor != null)
+        {
+            if (cursor.moveToFirst())
+            {
+                contactName = cursor.getString(0);
+            }
+            cursor.close();
+        }
+
+        return contactName;
+    }
+
     public static ArrayList<String> getWhatsAppContacts()
     {
         Cursor c = CharpApplication.getAppContext().getContentResolver().query(
