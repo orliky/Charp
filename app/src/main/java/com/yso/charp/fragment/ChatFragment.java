@@ -53,8 +53,7 @@ import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_MESSAGES;
 import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_MESSAGES_LAST_MESSAGE;
 
 
-public class ChatFragment extends Fragment implements ImageClickListener
-{
+public class ChatFragment extends Fragment implements ImageClickListener {
     private final int PICK_IMAGE_REQUEST = 71;
 
     private RecyclerView mRecyclerView;
@@ -65,29 +64,26 @@ public class ChatFragment extends Fragment implements ImageClickListener
     private ChatMessageAdapter mAdapter;
     private Bitmap mMessageBitmap;
     private ImageView mImageView;
-    private HashMap<String, List<ChatMessage>> mChatMap = new HashMap<>();
+    private HashMap<String, ChatMessage> mChatMap = new HashMap<>();
     private ChatMessageRepo mChatMessageRepo;
-    @SuppressLint ("StaticFieldLeak")
+    @SuppressLint("StaticFieldLeak")
     private static ChatFragment mInstance;
+    private ChildEventListener mChildEventListener;
 
-    public ChatFragment()
-    {
+    public ChatFragment() {
 
     }
 
-    public static ChatFragment getInstance()
-    {
-        if (mInstance == null)
-        {
+    public static ChatFragment getInstance() {
+        if (mInstance == null) {
             mInstance = new ChatFragment();
         }
         return mInstance;
     }
 
-    @SuppressLint ("NewApi")
+    @SuppressLint("NewApi")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
 
         mChatMessageRepo = new ChatMessageRepo();
@@ -99,8 +95,7 @@ public class ChatFragment extends Fragment implements ImageClickListener
 
         Bundle bundle = this.getArguments();
 
-        if (bundle != null)
-        {
+        if (bundle != null) {
             mChatUser = bundle.getString("user_phone");
         }
 
@@ -108,6 +103,7 @@ public class ChatFragment extends Fragment implements ImageClickListener
         initListFromDB();
         mAdapter = new ChatMessageAdapter(getContext(), messagesList);
 
+        initChildEventListener();
         loadMessages();
 
         mAdapter.setClickListener(this);
@@ -121,45 +117,82 @@ public class ChatFragment extends Fragment implements ImageClickListener
 
         mImageView = view.findViewById(R.id.image_input);
         ImageView chooseImage = view.findViewById(R.id.message_choose_image);
-        chooseImage.setOnClickListener(new View.OnClickListener()
-        {
+        chooseImage.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 chooseImage();
             }
         });
+
         return view;
     }
 
-    private void initListFromDB()
-    {
+    private void initChildEventListener() {
+        mChildEventListener =  new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (!dataSnapshot.getKey().equals(FB_CHILD_MESSAGES_LAST_MESSAGE)) {
+                    ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
+//                    if(mChatMap.get(dataSnapshot.getKey()) == null) {
+                    mChatMap.put(dataSnapshot.getKey(), chatMessage);
+
+                    assert chatMessage != null;
+                    getImage(chatMessage);
+
+                    messagesList.add(chatMessage);
+                    mAdapter.notifyDataSetChanged();
+                    mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
+//                    }
+                    if (mChatMessageRepo.getById(dataSnapshot.getKey()) == null) {
+                        mChatMessageRepo.insert(dataSnapshot.getKey(), chatMessage.getMessageUser(), chatMessage);
+                    }
+                }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+    }
+
+    private void initListFromDB() {
         messagesList.addAll(mChatMessageRepo.getByChat(mCurrentUserId, mChatUser));
         messagesList.addAll(mChatMessageRepo.getByChat(mChatUser, mCurrentUserId));
-        Collections.sort(messagesList, new Comparator<ChatMessage>()
-        {
+        Collections.sort(messagesList, new Comparator<ChatMessage>() {
             @Override
-            public int compare(ChatMessage s1, ChatMessage s2)
-            {
+            public int compare(ChatMessage s1, ChatMessage s2) {
                 return Long.compare(s1.getMessageTime(), s2.getMessageTime());
             }
         });
-        for(ChatMessage chatMessage: messagesList){
+        for (ChatMessage chatMessage : messagesList) {
             getImage(chatMessage);
         }
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
-    {
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         FloatingActionButton fab = view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener()
-        {
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 sendMessage();
                 input.setText("");
             }
@@ -167,14 +200,11 @@ public class ChatFragment extends Fragment implements ImageClickListener
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null)
-        {
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
             Uri filePath = data.getData();
-            try
-            {
+            try {
                 mMessageBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), filePath);
 
                 float aspectRatio = mMessageBitmap.getWidth() / (float) mMessageBitmap.getHeight();
@@ -184,69 +214,26 @@ public class ChatFragment extends Fragment implements ImageClickListener
 
                 mImageView.setVisibility(View.VISIBLE);
                 mImageView.setImageBitmap(mMessageBitmap);
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private void loadMessages()
-    {
-        messagesList.clear();
-        FireBaseManager.loadChatMessages(mCurrentUserId, mChatUser, new ChildEventListener()
-        {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s)
-            {
-                if (!dataSnapshot.getKey().equals(FB_CHILD_MESSAGES_LAST_MESSAGE))
-                {
-                    ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
-
-                    assert chatMessage != null;
-                    getImage(chatMessage);
-
-                    messagesList.add(chatMessage);
-                    mAdapter.notifyDataSetChanged();
-                    mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
-
-                    if (mChatMessageRepo.getById(dataSnapshot.getKey()) == null)
-                    {
-                        mChatMessageRepo.insert(dataSnapshot.getKey(), chatMessage.getMessageUser(), chatMessage);
-                    }
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s)
-            {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot)
-            {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s)
-            {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError)
-            {
-
-            }
-        });
+    @Override
+    public void onPause() {
+        super.onPause();
+//        mChatMap.clear();
+        FireBaseManager.getDatabaseReferencem().child(FB_CHILD_MESSAGES).child(mCurrentUserId).child(mChatUser).removeEventListener(mChildEventListener);
     }
 
-    private void getImage(ChatMessage chatMessage)
-    {
-        if (chatMessage.getBase64Image() != null && !chatMessage.getBase64Image().equals(""))
-        {
+    private void loadMessages() {
+        messagesList.clear();
+        FireBaseManager.loadChatMessages(mCurrentUserId, mChatUser, mChildEventListener);
+    }
+
+    private void getImage(ChatMessage chatMessage) {
+        if (chatMessage.getBase64Image() != null && !chatMessage.getBase64Image().equals("")) {
             byte[] imageBytes = Base64.decode(chatMessage.getBase64Image(), Base64.DEFAULT);
             Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
 
@@ -254,11 +241,9 @@ public class ChatFragment extends Fragment implements ImageClickListener
         }
     }
 
-    private void sendMessage()
-    {
+    private void sendMessage() {
         final String message = input.getText().toString();
-        if ((!TextUtils.isEmpty(message) && message.trim().length() > 0) || mMessageBitmap != null)
-        {
+        if ((!TextUtils.isEmpty(message) && message.trim().length() > 0) || mMessageBitmap != null) {
             mImageView.setVisibility(View.GONE);
             String current_user_ref = FB_CHILD_MESSAGES + "/" + mCurrentUserId + "/" + mChatUser;
             String chat_user_ref = FB_CHILD_MESSAGES + "/" + mChatUser + "/" + mCurrentUserId;
@@ -267,8 +252,7 @@ public class ChatFragment extends Fragment implements ImageClickListener
             String push_id = user_message_push.getKey();
             ChatMessage chatMessage = new ChatMessage(message, FireBaseManager.getFirebaseUserPhone());
 
-            if (mMessageBitmap != null)
-            {
+            if (mMessageBitmap != null) {
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 mMessageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                 byte[] b = stream.toByteArray();
@@ -286,13 +270,10 @@ public class ChatFragment extends Fragment implements ImageClickListener
 
             input.setText("");
 
-            FireBaseManager.updateChildren(messageUserMap, new DatabaseReference.CompletionListener()
-            {
+            FireBaseManager.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
                 @Override
-                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference)
-                {
-                    if (databaseError != null)
-                    {
+                public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                    if (databaseError != null) {
                         Log.d("CHAT_LOG", databaseError.getMessage());
                         return;
                     }
@@ -301,44 +282,36 @@ public class ChatFragment extends Fragment implements ImageClickListener
                     Snackbar.make(getActivity().findViewById(android.R.id.content), "נשלחה הודעה", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
                 }
             });
-        }
-        else
-        {
+        } else {
             Snackbar.make(getActivity().findViewById(android.R.id.content), "אנא הכנס הודעה או תמונה", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
         }
     }
 
-    private void chooseImage()
-    {
+    private void chooseImage() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
     }
 
-    private void sendNotificationToUser(String userPhone, String message)
-    {
+    private void sendNotificationToUser(String userPhone, String message) {
         HashMap users = PersistenceManager.getInstance().getUsersMap();
         User user = (User) users.get(userPhone);
-        if (user != null && !user.getPhone().equals(FireBaseManager.getFirebaseUserPhone()))
-        {
+        if (user != null && !user.getPhone().equals(FireBaseManager.getFirebaseUserPhone())) {
             NotificationUtils.sendNotification(user.getPhone(), FireBaseManager.getFirebaseUserPhone(), message, "chat_view");
         }
     }
 
     @Override
-    public void onItemClick(Bitmap bitmap)
-    {
+    public void onItemClick(Bitmap bitmap) {
         final Dialog nagDialog = new Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
         nagDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         nagDialog.setContentView(R.layout.preview_image);
         ImageView ivPreview = nagDialog.findViewById(R.id.iv_preview_image);
         ImageView closePreview = nagDialog.findViewById(R.id.close_preview);
-        closePreview.setOnClickListener(new View.OnClickListener()
-        {
+        closePreview.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v) {
                 nagDialog.dismiss();
             }
         });
