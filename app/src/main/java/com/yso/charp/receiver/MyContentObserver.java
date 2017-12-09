@@ -2,6 +2,7 @@ package com.yso.charp.receiver;
 
 import android.database.ContentObserver;
 
+import com.google.firebase.database.ValueEventListener;
 import com.yso.charp.mannager.FireBaseManager;
 
 /**
@@ -10,13 +11,15 @@ import com.yso.charp.mannager.FireBaseManager;
 
 public class MyContentObserver  extends ContentObserver
 {
-    public MyContentObserver() {
+    private ValueEventListener mValueEventListener;
+    public MyContentObserver(ValueEventListener valueEventListener) {
         super(null);
+        mValueEventListener = valueEventListener;
     }
 
     @Override
     public void onChange(boolean selfChange) {
         super.onChange(selfChange);
-        FireBaseManager.updateClientUsers();
+        FireBaseManager.updateClientUsers(mValueEventListener, true);
     }
 }

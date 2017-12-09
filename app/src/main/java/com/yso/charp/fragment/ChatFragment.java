@@ -41,6 +41,7 @@ import com.yso.charp.utils.NotificationUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -51,10 +52,14 @@ import java.util.Map;
 import static android.app.Activity.RESULT_OK;
 import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_MESSAGES;
 import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_MESSAGES_LAST_MESSAGE;
+import static com.yso.charp.mannager.FireBaseManager.getDatabaseReferencem;
+import static com.yso.charp.mannager.FireBaseManager.loadChatMessages;
 
 
 public class ChatFragment extends Fragment implements ImageClickListener {
     private final int PICK_IMAGE_REQUEST = 71;
+    public static final String USER_PHONE = "user_phone";
+    public static final String LIST_DATA = "list_data";
 
     private RecyclerView mRecyclerView;
     private EditText input;
@@ -67,16 +72,28 @@ public class ChatFragment extends Fragment implements ImageClickListener {
     private HashMap<String, ChatMessage> mChatMap = new HashMap<>();
     private ChatMessageRepo mChatMessageRepo;
     @SuppressLint("StaticFieldLeak")
-    private static ChatFragment mInstance;
     private ChildEventListener mChildEventListener;
+    @SuppressLint("StaticFieldLeak")
+    private static ChatFragment mInstance;
 
     public ChatFragment() {
 
     }
 
-    public static ChatFragment getInstance() {
+    public static ChatFragment newInstance(String key) {
+        Bundle bundle = new Bundle();
+        bundle.putString(USER_PHONE, key);
+
+//        bundle.putSerializable(LIST_DATA, (Serializable) initListFromDB(key));
+
+        ChatFragment chatFragment = new ChatFragment();
+        chatFragment.setArguments(bundle);
+        return chatFragment;
+    }
+
+    public static ChatFragment getInstance(String key) {
         if (mInstance == null) {
-            mInstance = new ChatFragment();
+            mInstance = newInstance(key);
         }
         return mInstance;
     }
@@ -90,13 +107,14 @@ public class ChatFragment extends Fragment implements ImageClickListener {
 
         input = view.findViewById(R.id.input);
 
-        mRootRef = FireBaseManager.getDatabaseReferencem();
+        mRootRef = getDatabaseReferencem();
         mCurrentUserId = FireBaseManager.getFirebaseUserPhone();
 
         Bundle bundle = this.getArguments();
 
         if (bundle != null) {
-            mChatUser = bundle.getString("user_phone");
+            mChatUser = bundle.getString(USER_PHONE);
+//            messagesList = (List<ChatMessage>) bundle.getSerializable(LIST_DATA);
         }
 
         mRecyclerView = view.findViewById(R.id.list_of_messages);
@@ -128,7 +146,7 @@ public class ChatFragment extends Fragment implements ImageClickListener {
     }
 
     private void initChildEventListener() {
-        mChildEventListener =  new ChildEventListener() {
+        mChildEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (!dataSnapshot.getKey().equals(FB_CHILD_MESSAGES_LAST_MESSAGE)) {
@@ -185,6 +203,28 @@ public class ChatFragment extends Fragment implements ImageClickListener {
         }
     }
 
+    private static List<ChatMessage> initListFromDB(String chatUser) {
+        List<ChatMessage> list = new ArrayList<>();
+        ChatMessageRepo chatMessageRepo = new ChatMessageRepo();
+        list.addAll(chatMessageRepo.getByChat(FireBaseManager.getFirebaseUserPhone(), chatUser));
+        list.addAll(chatMessageRepo.getByChat(chatUser, FireBaseManager.getFirebaseUserPhone()));
+        Collections.sort(list, new Comparator<ChatMessage>() {
+            @Override
+            public int compare(ChatMessage s1, ChatMessage s2) {
+                return Long.compare(s1.getMessageTime(), s2.getMessageTime());
+            }
+        });
+        for (ChatMessage chatMessage : list) {
+            if (chatMessage.getBase64Image() != null && !chatMessage.getBase64Image().equals("")) {
+                byte[] imageBytes = Base64.decode(chatMessage.getBase64Image(), Base64.DEFAULT);
+                Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+
+                chatMessage.setBitmap(decodedImage);
+            }
+        }
+        return list;
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -224,12 +264,12 @@ public class ChatFragment extends Fragment implements ImageClickListener {
     public void onPause() {
         super.onPause();
 //        mChatMap.clear();
-        FireBaseManager.getDatabaseReferencem().child(FB_CHILD_MESSAGES).child(mCurrentUserId).child(mChatUser).removeEventListener(mChildEventListener);
+        getDatabaseReferencem().child(FB_CHILD_MESSAGES).child(mCurrentUserId).child(mChatUser).removeEventListener(mChildEventListener);
     }
 
     private void loadMessages() {
         messagesList.clear();
-        FireBaseManager.loadChatMessages(mCurrentUserId, mChatUser, mChildEventListener);
+        loadChatMessages(mCurrentUserId, mChatUser, mChildEventListener);
     }
 
     private void getImage(ChatMessage chatMessage) {

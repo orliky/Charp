@@ -27,6 +27,10 @@ import com.yso.charp.utils.ContactsUtils;
 
 import java.util.HashMap;
 
+import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_CLIENT_USERS;
+import static com.yso.charp.mannager.FireBaseManager.getDatabaseReferencem;
+import static com.yso.charp.mannager.FireBaseManager.getFirebaseUserPhone;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -40,6 +44,7 @@ public class UserListFragment extends Fragment implements ChatItemClickListener 
     @SuppressLint("StaticFieldLeak")
     private static UserListFragment mInstance;
     private UserRepo mUserRepo;
+    private ValueEventListener mValueEventListener;
 
     public UserListFragment() {
     }
@@ -73,12 +78,22 @@ public class UserListFragment extends Fragment implements ChatItemClickListener 
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), new LinearLayoutManager(getContext()).getOrientation());
         mRecyclerView.addItemDecoration(dividerItemDecoration);
-
+        initValueEventListener();
         loadClientUsers();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        getDatabaseReferencem().child(FB_CHILD_CLIENT_USERS).child(getFirebaseUserPhone()).removeEventListener(mValueEventListener);
+    }
+
     private void loadClientUsers() {
-        FireBaseManager.loadClientUsers(new ValueEventListener() {
+        FireBaseManager.loadClientUsers(mValueEventListener);
+    }
+
+    private void initValueEventListener() {
+        mValueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 userList.clear();
@@ -97,15 +112,11 @@ public class UserListFragment extends Fragment implements ChatItemClickListener 
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        };
     }
 
     @Override
     public void onItemClick(String key) {
-        Bundle bundle = new Bundle();
-        bundle.putString("user_phone", key);
-
-        ((MainActivity) getActivity()).goToChatFragment(bundle);
-//        getActivity().setTitle("Charp - " + ContactsUtils.getContactName(key));
+        ((MainActivity) getActivity()).goToChatFragment(key);
     }
 }

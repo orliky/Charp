@@ -29,38 +29,28 @@ import java.util.Map;
  */
 
 public class FireBaseManager {
-    public static final String FB_CHILD_USERS = "Users";
+    private static final String FB_CHILD_USERS = "Users";
     public static final String FB_CHILD_CLIENT_USERS = "ClientUsers";
     public static final String FB_CHILD_MESSAGES = "Messages";
     public static final String FB_CHILD_MESSAGES_MESSAGE_TEXT = "messageText";
     public static final String FB_CHILD_MESSAGES_LAST_MESSAGE = "lastMessage";
     public static final String FB_CHILD_NOTIFICATION = "Notifications";
-    public static final String FB_CHILD_NOTIFICATION_STATUS = "status";
+    private static final String FB_CHILD_NOTIFICATION_STATUS = "status";
 
-    private static FirebaseAuth mFirebaseAuth;
-    private static FirebaseUser mFirebaseUser;
-    private static DatabaseReference mDatabaseReferencem;
-    private static String mFirebaseUserPhone;
-
-    public static FirebaseAuth getFirebaseAuth() {
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        return mFirebaseAuth;
+    private static FirebaseAuth getFirebaseAuth() {
+        return FirebaseAuth.getInstance();
     }
 
     public static FirebaseUser getFirebaseUser() {
-        mFirebaseUser = getFirebaseAuth().getCurrentUser();
-        return mFirebaseUser;
+        return getFirebaseAuth().getCurrentUser();
     }
 
     public static String getFirebaseUserPhone() {
-//        String phone = getFirebaseUser().getPhoneNumber().replace(" ", "");
-        mFirebaseUserPhone = getFirebaseUser().getPhoneNumber();
-        return mFirebaseUserPhone;
+        return getFirebaseUser().getPhoneNumber();
     }
 
     public static DatabaseReference getDatabaseReferencem() {
-        mDatabaseReferencem = FirebaseDatabase.getInstance().getReference();
-        return mDatabaseReferencem;
+        return FirebaseDatabase.getInstance().getReference();
     }
 
     public static void updateName(String name) {
@@ -123,45 +113,11 @@ public class FireBaseManager {
         getDatabaseReferencem().child(FB_CHILD_CLIENT_USERS).child(getFirebaseUserPhone()).addValueEventListener(valueEventListener);
     }
 
-    public static void updateClientUsers() {
-        final HashMap<String, User> clientUsers = new HashMap<>();
-//        final HashMap<String, User> allUsers = new HashMap<>();
-        getDatabaseReferencem().child(FB_CHILD_USERS).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    User user = snapshot.getValue(User.class);
-                    assert user != null;
-                    if (!user.getPhone().equals(getFirebaseUserPhone())) {
-//                        allUsers.put(user.getPhone(), user);
-                        if(ContactsUtils.getContactNumber(user.getPhone()) != null && !ContactsUtils.getContactNumber(user.getPhone()).equals(""))
-                        {
-                            clientUsers.put(user.getPhone(), user);
-                        }
-                    }
-                }
-
-//                ArrayList contacts = ContactsUtils.getAllContactPhoneNumbers(CharpApplication.getAppContext());
-//
-//                for (Object phone : contacts) {
-//                    phone = phone.toString().replace(" ", "");
-//                    if (phone.toString().startsWith("0")) {
-//                        phone = "+972" + phone.toString().substring(1);
-//                    }
-//                    if (allUsers.get(phone) != null) {
-//                        clientUsers.put((String) phone, allUsers.get(phone));
-//                    }
-//                }
-
-                FirebaseDatabase.getInstance().getReference().child(FB_CHILD_CLIENT_USERS).child(getFirebaseUserPhone()).setValue(clientUsers);
-
-                PersistenceManager.getInstance().setUsersMap(clientUsers);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+    public static void updateClientUsers(ValueEventListener valueEventListener, boolean isServiceUpdate) {
+        if (isServiceUpdate) {
+            getDatabaseReferencem().child(FB_CHILD_USERS).addListenerForSingleValueEvent(valueEventListener);
+        } else {
+            getDatabaseReferencem().child(FB_CHILD_USERS).addValueEventListener(valueEventListener);
+        }
     }
 }
