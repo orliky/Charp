@@ -35,34 +35,40 @@ import static com.yso.charp.mannager.FireBaseManager.getFirebaseUserPhone;
 /**
  * A simple {@link Fragment} subclass.
  */
-@SuppressLint("ValidFragment")
-public class UserListFragment extends Fragment implements ChatItemClickListener {
+@SuppressLint ("ValidFragment")
+public class UserListFragment extends Fragment implements ChatItemClickListener
+{
 
     private RecyclerView mRecyclerView;
     private HashMap<String, User> userList = new HashMap<>();
     private UserListAdapter mAdapter;
-    @SuppressLint("StaticFieldLeak")
+    @SuppressLint ("StaticFieldLeak")
     private static UserListFragment mInstance;
     private UserRepo mUserRepo;
     private ValueEventListener mValueEventListener;
 
-    public UserListFragment() {
+    public UserListFragment()
+    {
     }
 
-    public static UserListFragment getInstance() {
-        if (mInstance == null) {
+    public static UserListFragment getInstance()
+    {
+        if (mInstance == null)
+        {
             mInstance = new UserListFragment();
         }
         return mInstance;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
         return inflater.inflate(R.layout.fragment_user_list, container, false);
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
         super.onViewCreated(view, savedInstanceState);
 
         mUserRepo = new UserRepo();
@@ -83,24 +89,31 @@ public class UserListFragment extends Fragment implements ChatItemClickListener 
     }
 
     @Override
-    public void onPause() {
+    public void onPause()
+    {
         super.onPause();
         getDatabaseReferencem().child(FB_CHILD_CLIENT_USERS).child(getFirebaseUserPhone()).removeEventListener(mValueEventListener);
     }
 
-    private void loadClientUsers() {
+    private void loadClientUsers()
+    {
         FireBaseManager.loadClientUsers(mValueEventListener);
     }
 
-    private void initValueEventListener() {
-        mValueEventListener = new ValueEventListener() {
+    private void initValueEventListener()
+    {
+        mValueEventListener = new ValueEventListener()
+        {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(DataSnapshot dataSnapshot)
+            {
                 userList.clear();
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                for (DataSnapshot snapshot : dataSnapshot.getChildren())
+                {
                     User user = snapshot.getValue(User.class);
                     userList.put(user.getPhone(), user);
-                    if (mUserRepo.getByPhone(user.getPhone()) == null) {
+                    if (mUserRepo.getByPhone(user.getPhone()) == null)
+                    {
                         mUserRepo.insert(user);
                     }
                 }
@@ -109,14 +122,24 @@ public class UserListFragment extends Fragment implements ChatItemClickListener 
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(DatabaseError databaseError)
+            {
 
             }
         };
     }
 
     @Override
-    public void onItemClick(String key) {
+    public void onItemClick(String key)
+    {
         ((MainActivity) getActivity()).goToChatFragment(key);
+    }
+
+    public void refreshAdapter()
+    {
+        if (isAdded())
+        {
+            loadClientUsers();
+        }
     }
 }

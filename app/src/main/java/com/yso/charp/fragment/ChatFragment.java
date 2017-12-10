@@ -84,7 +84,7 @@ public class ChatFragment extends Fragment implements ImageClickListener {
         Bundle bundle = new Bundle();
         bundle.putString(USER_PHONE, key);
 
-//        bundle.putSerializable(LIST_DATA, (Serializable) initListFromDB(key));
+        bundle.putSerializable(LIST_DATA, (Serializable) initListFromDB(key));
 
         ChatFragment chatFragment = new ChatFragment();
         chatFragment.setArguments(bundle);
@@ -114,11 +114,11 @@ public class ChatFragment extends Fragment implements ImageClickListener {
 
         if (bundle != null) {
             mChatUser = bundle.getString(USER_PHONE);
-//            messagesList = (List<ChatMessage>) bundle.getSerializable(LIST_DATA);
+            messagesList = (List<ChatMessage>) bundle.getSerializable(LIST_DATA);
         }
 
         mRecyclerView = view.findViewById(R.id.list_of_messages);
-        initListFromDB();
+//        initListFromDB();
         mAdapter = new ChatMessageAdapter(getContext(), messagesList);
 
         initChildEventListener();

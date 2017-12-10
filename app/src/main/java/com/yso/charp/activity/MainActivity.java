@@ -25,6 +25,7 @@ import com.yso.charp.R;
 import com.yso.charp.fragment.ChatFragment;
 import com.yso.charp.fragment.ChatListFragment;
 import com.yso.charp.fragment.MainFragment;
+import com.yso.charp.fragment.UserListFragment;
 import com.yso.charp.mannager.FireBaseManager;
 import com.yso.charp.mannager.PersistenceManager;
 import com.yso.charp.model.User;
@@ -149,6 +150,7 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
 
         ChatListFragment.getInstance().refreshAdapter();
+        UserListFragment.getInstance().refreshAdapter();
     }
 
     @Override
