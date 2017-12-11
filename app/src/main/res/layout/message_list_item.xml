@@ -56,20 +56,21 @@
                 android:layout_height="wrap_content"
                 android:text="hello"
                 android:layout_gravity="top"
-                android:layout_marginBottom="3dp"
                 android:layout_marginEnd="5dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
                 android:textSize="16sp"/>
 
-            <TextView
-                android:id="@+id/message_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:gravity="end"
-                android:maxLines="1"
-                android:text="10:00"
-                android:textSize="12dp"/>
+
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/message_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:gravity="end"
+            android:maxLines="1"
+            android:text="10:00"
+            android:textSize="12dp"/>
     </LinearLayout>
 </LinearLayout>

@@ -27,19 +27,19 @@ public class ChatMessageRepo {
     static String createTable() {
         return "CREATE TABLE IF NOT EXISTS " + ChatMessage.TABLE + "("
                 + ChatMessage.KEY_ID + " TEXT NOT NULL,"
-                + ChatMessage.KEY_FROM + " TEXT NOT NULL,"
+                + ChatMessage.KEY_TO + " TEXT NOT NULL,"
                 + ChatMessage.KEY_PHONE + " TEXT NOT NULL,"
                 + ChatMessage.KEY_TEXT + " TEXT,"
                 + ChatMessage.KEY_TIME + " INTEGER,"
                 + ChatMessage.KEY_BASE64 + " TEXT);";
     }
 
-    public void insert(String id, String from, ChatMessage chatMessage) {
+    public void insert(String id, String other, ChatMessage chatMessage) {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
 
         ContentValues values = new ContentValues();
         values.put(ChatMessage.KEY_ID, id);
-        values.put(ChatMessage.KEY_FROM, from);
+        values.put(ChatMessage.KEY_TO, other);
         values.put(ChatMessage.KEY_PHONE, chatMessage.getMessageUser());
         values.put(ChatMessage.KEY_TEXT, chatMessage.getMessageText());
         values.put(ChatMessage.KEY_TIME, String.valueOf(chatMessage.getMessageTime()));
@@ -98,7 +98,7 @@ public class ChatMessageRepo {
         SQLiteDatabase db = DatabaseManager.getInstance().openDatabase();
         Cursor cursor = db.query(ChatMessage.TABLE,
                 ChatMessage.COLUMNS,
-                ChatMessage.KEY_PHONE + "=?" + " AND " + ChatMessage.KEY_FROM + "=?",
+                ChatMessage.KEY_PHONE + "=?" + " AND " + ChatMessage.KEY_TO + "=?",
                 new String[]{currentUser, otherUser},
                 null, null, null);
 

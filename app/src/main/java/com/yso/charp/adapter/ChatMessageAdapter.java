@@ -75,10 +75,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
     @Override
     public void onBindViewHolder(final MessageViewHolder viewHolder, int i)
     {
-
         final ChatMessage c = mMessageList.get(i);
-
-        setGravityByUser(viewHolder, c);
 
         String contactName = ContactsUtils.getContactName(c.getMessageUser());
         String name = contactName.equals("") ? c.getMessageUser() : contactName;
@@ -88,24 +85,6 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
 
         if (c.getBitmap() != null)
         {
-        /*if (c.getBase64Image() != null && !c.getBase64Image().equals(""))
-        {
-
-            byte[] imageBytes = Base64.decode(c.getBase64Image(), Base64.DEFAULT);
-            Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-
-
-//            Bitmap ThumbImage = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length), 50, 50);
-
-            float aspectRatio = decodedImage.getWidth() / (float) decodedImage.getHeight();
-            int width = 480;
-            int height = Math.round(width / aspectRatio);
-            decodedImage = Bitmap.createScaledBitmap(decodedImage, width, height, false);
-
-
-            viewHolder.messageImage.setImageBitmap(decodedImage);
-
-            final Bitmap finalDecodedImage = decodedImage;*/
             viewHolder.messageImage.setImageBitmap(c.getBitmap());
             viewHolder.messageImage.setVisibility(View.VISIBLE);
             viewHolder.messageImage.setOnClickListener(new View.OnClickListener()
@@ -125,26 +104,58 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
             viewHolder.messageImage.setVisibility(View.GONE);
         }
 
+        setGravityByUser(viewHolder, c, i);
     }
 
-    private void setGravityByUser(MessageViewHolder viewHolder, ChatMessage c)
+    private void setGravityByUser(MessageViewHolder viewHolder, ChatMessage c, int position)
     {
+        boolean isContinuationMessage = false;
+        if (position > 0)
+        {
+            ChatMessage previousMessage = mMessageList.get(position - 1);
+            if (c.getMessageUser().equals(previousMessage.getMessageUser()) && c.getMessageTime() - previousMessage.getMessageTime() < 20000)
+            {
+                isContinuationMessage = true;
+            }
+        }
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         if (c.getMessageUser().equals(FireBaseManager.getFirebaseUserPhone()))
         {
             layoutParams.gravity = Gravity.START;
             viewHolder.group.setLayoutParams(layoutParams);
-            viewHolder.group.setBackgroundResource(R.drawable.bg_my_message);
+            if (!isContinuationMessage)
+            {
+                viewHolder.group.setBackgroundResource(R.drawable.bg_my_message);
+            }
+            else
+            {
+                viewHolder.group.setBackgroundResource(R.drawable.bg_my1_message);
+                layoutParams.setMarginStart(20);
+            }
             layoutParams.setMarginEnd(150);
-            viewHolder.group.setPadding(0, 0, 35, 0);
+            if (!c.getMessageText().equals(""))
+            {
+                viewHolder.group.setPadding(0, 0, 35, 0);
+            }
         }
         else
         {
             layoutParams.gravity = Gravity.END;
             viewHolder.group.setLayoutParams(layoutParams);
-            viewHolder.group.setBackgroundResource(R.drawable.bg_other_message);
+            if (!isContinuationMessage)
+            {
+                viewHolder.group.setBackgroundResource(R.drawable.bg_other_message);
+            }
+            else
+            {
+                viewHolder.group.setBackgroundResource(R.drawable.bg_other1_message);
+                layoutParams.setMarginEnd(20);
+            }
             layoutParams.setMarginStart(150);
-            viewHolder.group.setPadding(20, 0, 10, 0);
+            if (!c.getMessageText().equals(""))
+            {
+                viewHolder.group.setPadding(20, 0, 10, 0);
+            }
         }
     }
 

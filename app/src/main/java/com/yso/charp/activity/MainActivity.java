@@ -122,6 +122,29 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        /*if (requestCode == SIGN_IN_REQUEST_CODE)
+        {
+            if (resultCode == RESULT_OK)
+            {
+
+                FirebaseDatabase.getInstance().getReference().child("Users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).
+                        setValue(new User(FirebaseAuth.getInstance().getCurrentUser().getDisplayName(), FirebaseAuth.getInstance().getCurrentUser().getPhoneNumber(), FirebaseAuth.getInstance().getCurrentUser().getUid()));
+                init();
+            }
+            else
+            {
+                Snackbar.make(findViewById(android.R.id.content), "We couldn't sign you in. Please try again later.", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
+
+                finish();
+            }
+        }*/
+    }
+
     @RequiresApi (api = Build.VERSION_CODES.M)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
@@ -157,15 +180,15 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed()
     {
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(MY_FRAGMENT);
-        if(!(fragment instanceof ChatFragment))
-        {
-            super.onBackPressed();
-        }
-        else
+        if(fragment instanceof ChatFragment)
         {
             android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
             ft.remove(getSupportFragmentManager().findFragmentById(R.id.container)).commit();
+        }
+        else
+        {
+            super.onBackPressed();
         }
     }
 
@@ -197,7 +220,7 @@ public class MainActivity extends AppCompatActivity
 
     public void goToChatFragment(String key)
     {
-        ChatFragment chatFragment = ChatFragment.getInstance(key);
+        ChatFragment chatFragment = ChatFragment.newInstance(key);
         android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
         ft.add(R.id.container, chatFragment, MY_FRAGMENT).commit();

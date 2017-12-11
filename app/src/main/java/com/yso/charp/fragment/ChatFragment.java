@@ -41,7 +41,6 @@ import com.yso.charp.utils.NotificationUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -58,8 +57,7 @@ import static com.yso.charp.mannager.FireBaseManager.loadChatMessages;
 
 public class ChatFragment extends Fragment implements ImageClickListener {
     private final int PICK_IMAGE_REQUEST = 71;
-    public static final String USER_PHONE = "user_phone";
-    public static final String LIST_DATA = "list_data";
+    private static final String USER_PHONE = "user_phone";
 
     private RecyclerView mRecyclerView;
     private EditText input;
@@ -69,7 +67,6 @@ public class ChatFragment extends Fragment implements ImageClickListener {
     private ChatMessageAdapter mAdapter;
     private Bitmap mMessageBitmap;
     private ImageView mImageView;
-    private HashMap<String, ChatMessage> mChatMap = new HashMap<>();
     private ChatMessageRepo mChatMessageRepo;
     @SuppressLint("StaticFieldLeak")
     private ChildEventListener mChildEventListener;
@@ -83,8 +80,6 @@ public class ChatFragment extends Fragment implements ImageClickListener {
     public static ChatFragment newInstance(String key) {
         Bundle bundle = new Bundle();
         bundle.putString(USER_PHONE, key);
-
-        bundle.putSerializable(LIST_DATA, (Serializable) initListFromDB(key));
 
         ChatFragment chatFragment = new ChatFragment();
         chatFragment.setArguments(bundle);
@@ -114,15 +109,13 @@ public class ChatFragment extends Fragment implements ImageClickListener {
 
         if (bundle != null) {
             mChatUser = bundle.getString(USER_PHONE);
-            messagesList = (List<ChatMessage>) bundle.getSerializable(LIST_DATA);
         }
 
         mRecyclerView = view.findViewById(R.id.list_of_messages);
-//        initListFromDB();
+        initListFromDB();
         mAdapter = new ChatMessageAdapter(getContext(), messagesList);
 
         initChildEventListener();
-        loadMessages();
 
         mAdapter.setClickListener(this);
         LinearLayoutManager linearLayout = new LinearLayoutManager(getActivity());
@@ -151,18 +144,15 @@ public class ChatFragment extends Fragment implements ImageClickListener {
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (!dataSnapshot.getKey().equals(FB_CHILD_MESSAGES_LAST_MESSAGE)) {
                     ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
-//                    if(mChatMap.get(dataSnapshot.getKey()) == null) {
-                    mChatMap.put(dataSnapshot.getKey(), chatMessage);
-
-                    assert chatMessage != null;
                     getImage(chatMessage);
-
                     messagesList.add(chatMessage);
+
                     mAdapter.notifyDataSetChanged();
                     mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
-//                    }
+
+                    //add to DB
                     if (mChatMessageRepo.getById(dataSnapshot.getKey()) == null) {
-                        mChatMessageRepo.insert(dataSnapshot.getKey(), chatMessage.getMessageUser(), chatMessage);
+                        mChatMessageRepo.insert(dataSnapshot.getKey(), mChatUser, chatMessage);
                     }
                 }
             }
@@ -192,37 +182,15 @@ public class ChatFragment extends Fragment implements ImageClickListener {
     private void initListFromDB() {
         messagesList.addAll(mChatMessageRepo.getByChat(mCurrentUserId, mChatUser));
         messagesList.addAll(mChatMessageRepo.getByChat(mChatUser, mCurrentUserId));
+        for (ChatMessage chatMessage : messagesList) {
+            getImage(chatMessage);
+        }
         Collections.sort(messagesList, new Comparator<ChatMessage>() {
             @Override
             public int compare(ChatMessage s1, ChatMessage s2) {
                 return Long.compare(s1.getMessageTime(), s2.getMessageTime());
             }
         });
-        for (ChatMessage chatMessage : messagesList) {
-            getImage(chatMessage);
-        }
-    }
-
-    private static List<ChatMessage> initListFromDB(String chatUser) {
-        List<ChatMessage> list = new ArrayList<>();
-        ChatMessageRepo chatMessageRepo = new ChatMessageRepo();
-        list.addAll(chatMessageRepo.getByChat(FireBaseManager.getFirebaseUserPhone(), chatUser));
-        list.addAll(chatMessageRepo.getByChat(chatUser, FireBaseManager.getFirebaseUserPhone()));
-        Collections.sort(list, new Comparator<ChatMessage>() {
-            @Override
-            public int compare(ChatMessage s1, ChatMessage s2) {
-                return Long.compare(s1.getMessageTime(), s2.getMessageTime());
-            }
-        });
-        for (ChatMessage chatMessage : list) {
-            if (chatMessage.getBase64Image() != null && !chatMessage.getBase64Image().equals("")) {
-                byte[] imageBytes = Base64.decode(chatMessage.getBase64Image(), Base64.DEFAULT);
-                Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-
-                chatMessage.setBitmap(decodedImage);
-            }
-        }
-        return list;
     }
 
     @Override
@@ -261,9 +229,15 @@ public class ChatFragment extends Fragment implements ImageClickListener {
     }
 
     @Override
+    public void onResume()
+    {
+        super.onResume();
+        loadMessages();
+    }
+
+    @Override
     public void onPause() {
         super.onPause();
-//        mChatMap.clear();
         getDatabaseReferencem().child(FB_CHILD_MESSAGES).child(mCurrentUserId).child(mChatUser).removeEventListener(mChildEventListener);
     }
 
@@ -317,8 +291,11 @@ public class ChatFragment extends Fragment implements ImageClickListener {
                         Log.d("CHAT_LOG", databaseError.getMessage());
                         return;
                     }
+                    //send notif
                     sendNotificationToUser(mChatUser, message);
+                    //scroll to bottom
                     mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
+                    //show sign on screen
                     Snackbar.make(getActivity().findViewById(android.R.id.content), "נשלחה הודעה", Snackbar.LENGTH_SHORT).setAction("Action", null).show();
                 }
             });

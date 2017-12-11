@@ -85,6 +85,12 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), new LinearLayoutManager(getContext()).getOrientation());
         mRecyclerView.addItemDecoration(dividerItemDecoration);
         initValueEventListener();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
         loadClientUsers();
     }
 

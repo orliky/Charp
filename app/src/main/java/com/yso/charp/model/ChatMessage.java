@@ -2,19 +2,21 @@ package com.yso.charp.model;
 
 import android.graphics.Bitmap;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Created by Admin on 16-Nov-17.
  */
 
-public class ChatMessage {
+public class ChatMessage
+{
 
     public static final String TAG = ChatMessage.class.getSimpleName();
     public static final String TABLE = "ChatMessage";
     // Labels Table Columns names
     public static final String KEY_ID = "id";
-    public static final String KEY_FROM = "fromUser";
+    public static final String KEY_TO = "toUser";
     public static final String KEY_PHONE = "phone";
     public static final String KEY_TEXT = "messageText";
     public static final String KEY_TIME = "messageTime";
@@ -22,7 +24,7 @@ public class ChatMessage {
     //String[] Columns
     public static final String[] COLUMNS =
             {KEY_ID,
-                    KEY_FROM,
+                    KEY_TO,
                     KEY_PHONE,
                     KEY_TEXT,
                     KEY_TIME,

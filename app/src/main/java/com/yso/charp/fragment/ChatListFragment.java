@@ -84,6 +84,12 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener 
 
         mProgressBar = view.findViewById(R.id.chat_list_progress);
         initValueEventListener();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
         loadChatList();
     }
 
