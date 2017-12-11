@@ -112,7 +112,7 @@ public class ChatFragment extends Fragment implements ImageClickListener {
         }
 
         mRecyclerView = view.findViewById(R.id.list_of_messages);
-        initListFromDB();
+//        initListFromDB();
         mAdapter = new ChatMessageAdapter(getContext(), messagesList);
 
         initChildEventListener();
@@ -232,6 +232,7 @@ public class ChatFragment extends Fragment implements ImageClickListener {
     public void onResume()
     {
         super.onResume();
+        initListFromDB();
         loadMessages();
     }
 
