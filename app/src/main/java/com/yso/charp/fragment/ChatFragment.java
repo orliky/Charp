@@ -37,6 +37,7 @@ import com.yso.charp.mannager.PersistenceManager;
 import com.yso.charp.mannager.dataBase.ChatMessageRepo;
 import com.yso.charp.model.ChatMessage;
 import com.yso.charp.model.User;
+import com.yso.charp.utils.ContactsUtils;
 import com.yso.charp.utils.NotificationUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -109,10 +110,11 @@ public class ChatFragment extends Fragment implements ImageClickListener {
 
         if (bundle != null) {
             mChatUser = bundle.getString(USER_PHONE);
+            getActivity().setTitle(ContactsUtils.getContactName(mChatUser));
         }
 
         mRecyclerView = view.findViewById(R.id.list_of_messages);
-//        initListFromDB();
+        initListFromDB();
         mAdapter = new ChatMessageAdapter(getContext(), messagesList);
 
         initChildEventListener();
@@ -143,17 +145,16 @@ public class ChatFragment extends Fragment implements ImageClickListener {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (!dataSnapshot.getKey().equals(FB_CHILD_MESSAGES_LAST_MESSAGE)) {
-                    ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
-                    getImage(chatMessage);
-                    messagesList.add(chatMessage);
-
-                    mAdapter.notifyDataSetChanged();
-                    mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
-
-                    //add to DB
+                    //if is not in db
                     if (mChatMessageRepo.getById(dataSnapshot.getKey()) == null) {
+                        ChatMessage chatMessage = dataSnapshot.getValue(ChatMessage.class);
+                        getImage(chatMessage);
+                        messagesList.add(chatMessage);
+                        //add to DB
                         mChatMessageRepo.insert(dataSnapshot.getKey(), mChatUser, chatMessage);
                     }
+                    mAdapter.notifyDataSetChanged();
+                    mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);
                 }
             }
 
@@ -232,7 +233,6 @@ public class ChatFragment extends Fragment implements ImageClickListener {
     public void onResume()
     {
         super.onResume();
-        initListFromDB();
         loadMessages();
     }
 
@@ -243,7 +243,6 @@ public class ChatFragment extends Fragment implements ImageClickListener {
     }
 
     private void loadMessages() {
-        messagesList.clear();
         loadChatMessages(mCurrentUserId, mChatUser, mChildEventListener);
     }
 

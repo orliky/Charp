@@ -78,8 +78,7 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageAdapter.
         final ChatMessage c = mMessageList.get(i);
 
         String contactName = ContactsUtils.getContactName(c.getMessageUser());
-        String name = contactName.equals("") ? c.getMessageUser() : contactName;
-        viewHolder.displayName.setText(name);
+        viewHolder.displayName.setText(contactName);
         viewHolder.messageText.setText(c.getMessageText());
         viewHolder.messageTime.setText(DateFormat.format("HH:mm", c.getMessageTime()));
 

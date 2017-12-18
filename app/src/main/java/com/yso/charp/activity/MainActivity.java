@@ -182,6 +182,7 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(MY_FRAGMENT);
         if(fragment instanceof ChatFragment)
         {
+            setTitle("Charp");
             android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
             ft.remove(getSupportFragmentManager().findFragmentById(R.id.container)).commit();

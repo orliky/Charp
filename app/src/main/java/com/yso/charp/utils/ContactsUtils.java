@@ -23,7 +23,7 @@ public abstract class ContactsUtils
 
         String[] projection = new String[]{ContactsContract.PhoneLookup.DISPLAY_NAME};
 
-        String contactName = "";
+        String contactName = phoneNumber;
         Cursor cursor = CharpApplication.getAppContext().getContentResolver().query(uri, projection, null, null, null);
 
         if (cursor != null)

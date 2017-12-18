@@ -100,7 +100,7 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener 
     }
 
     private void loadChatList() {
-        mProgressBar.setVisibility(View.VISIBLE);
+//        mProgressBar.setVisibility(View.VISIBLE);
         FireBaseManager.loadChatList(mValueEventListener);
     }
 
@@ -124,13 +124,13 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener 
                     }
                 }
                 PersistenceManager.getInstance().setChatsMap(chatList);
-                mProgressBar.setVisibility(View.GONE);
+//                mProgressBar.setVisibility(View.GONE);
                 mAdapter.setItems(chatList);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                mProgressBar.setVisibility(View.GONE);
+//                mProgressBar.setVisibility(View.GONE);
             }
         };
     }
