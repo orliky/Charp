@@ -37,7 +37,7 @@ public class FireBaseManager {
     public static final String FB_CHILD_NOTIFICATION = "Notifications";
     private static final String FB_CHILD_NOTIFICATION_STATUS = "status";
 
-    private static FirebaseAuth getFirebaseAuth() {
+    public static FirebaseAuth getFirebaseAuth() {
         return FirebaseAuth.getInstance();
     }
 
