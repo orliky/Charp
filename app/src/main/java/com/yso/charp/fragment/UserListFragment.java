@@ -29,6 +29,7 @@ import java.util.HashMap;
 
 import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_CLIENT_USERS;
 import static com.yso.charp.mannager.FireBaseManager.getDatabaseReferencem;
+import static com.yso.charp.mannager.FireBaseManager.getFirebaseUser;
 import static com.yso.charp.mannager.FireBaseManager.getFirebaseUserPhone;
 
 
@@ -58,6 +59,11 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
             mInstance = new UserListFragment();
         }
         return mInstance;
+    }
+
+    public ValueEventListener getValueEventListener()
+    {
+        return mValueEventListener;
     }
 
     @Override
@@ -98,7 +104,10 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
     public void onPause()
     {
         super.onPause();
-        getDatabaseReferencem().child(FB_CHILD_CLIENT_USERS).child(getFirebaseUserPhone()).removeEventListener(mValueEventListener);
+        if (getFirebaseUser() != null)
+        {
+            getDatabaseReferencem().child(FB_CHILD_CLIENT_USERS).child(getFirebaseUserPhone()).removeEventListener(mValueEventListener);
+        }
     }
 
     private void loadClientUsers()

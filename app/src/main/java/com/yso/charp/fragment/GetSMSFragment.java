@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -21,16 +22,17 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.FirebaseTooManyRequestsException;
 import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.yso.charp.R;
 import com.yso.charp.activity.MainActivity;
-import com.yso.charp.activity.PhoneAuthActivity;
 import com.yso.charp.mannager.FireBaseManager;
+import com.yso.charp.utils.AnimationUtils;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,6 +45,8 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
 
     private static final String KEY_VERIFY_IN_PROGRESS = "key_verify_in_progress";
 
+    private final int SPLASH_DISPLAY_LENGTH = 1000;
+
     private static final int STATE_INITIALIZED = 1;
     private static final int STATE_CODE_SENT = 2;
     private static final int STATE_VERIFY_FAILED = 3;
@@ -54,28 +58,35 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
     private String mVerificationId;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
+    private Timer mTimer;
 
     private ViewGroup mPhoneNumberViews;
 
     private TextView mTitleText;
     private TextView mStatusText;
     private TextView mDetailText;
+    private TextView mTimerText;
 
     private EditText mPhoneNumberField;
+    private EditText mVerificationField;
+    private EditText mNameField;
 
     private Button mStartButton;
-    private Button mResendButton;
+    private Button mVerifyButton;
+    private Button mSendNameButton;
+
+    private RelativeLayout mStartWrapper;
+    private RelativeLayout mVerifyWrapper;
 
     public GetSMSFragment()
     {
-        // Required empty public constructor
+
     }
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_get_sms, container, false);
     }
 
@@ -84,21 +95,30 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
     {
         super.onViewCreated(view, savedInstanceState);
 
-        mPhoneNumberViews = (ViewGroup) view.findViewById(R.id.get_sms_phone_auth_fields);
+        mPhoneNumberViews = view.findViewById(R.id.get_sms_phone_auth_fields);
 
-        mTitleText = (TextView) view.findViewById(R.id.get_sms_title_text);
-        mStatusText = (TextView) view.findViewById(R.id.get_sms_status);
-        mDetailText = (TextView) view.findViewById(R.id.get_sms_detail);
+        mTitleText = view.findViewById(R.id.get_sms_title_text);
+        mStatusText = view.findViewById(R.id.get_sms_status);
+        mDetailText = view.findViewById(R.id.get_sms_detail);
+        mTimerText = view.findViewById(R.id.get_sms_timer);
+        mTimerText.setClickable(false);
 
-        mPhoneNumberField = (EditText) view.findViewById(R.id.get_sms_field_phone_number);
+        mPhoneNumberField = view.findViewById(R.id.get_sms_field_phone_number);
+        mVerificationField = (EditText) view.findViewById(R.id.field_verification_code);
+        mNameField = (EditText) view.findViewById(R.id.field_user_name);
 
-        mStartButton = (Button) view.findViewById(R.id.get_sms_button_start_verification);
-        mResendButton = (Button) view.findViewById(R.id.get_sms_button_resend);
-        mResendButton.setEnabled(false);
+        mStartButton = view.findViewById(R.id.get_sms_button_start_verification);
+        mVerifyButton = view.findViewById(R.id.button_verify_phone);
+        mSendNameButton = view.findViewById(R.id.button_send_name);
+
+        mStartWrapper = view.findViewById(R.id.start_wrapper);
+        mVerifyWrapper = view.findViewById(R.id.verify_wrapper);
 
         // Assign click listeners
         mStartButton.setOnClickListener(this);
-        mResendButton.setOnClickListener(this);
+        mTimerText.setOnClickListener(this);
+        mVerifyButton.setOnClickListener(this);
+        mSendNameButton.setOnClickListener(this);
 
         // Initialize phone auth callbacks
         // [START phone_auth_callbacks]
@@ -108,6 +128,9 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
             @Override
             public void onVerificationCompleted(PhoneAuthCredential credential)
             {
+                AnimationUtils.slideDown(mStartWrapper);
+                mVerifyWrapper.setVisibility(View.VISIBLE);
+                AnimationUtils.slideUp(mVerifyWrapper);
                 // This callback will be invoked in two situations:
                 // 1 - Instant verification. In some cases the phone number can be instantly
                 //     verified without needing to send or enter a verification code.
@@ -141,6 +164,9 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
                     // Invalid request
                     // [START_EXCLUDE]
                     mPhoneNumberField.setError("Invalid phone number.");
+                    mTimer.cancel();
+                    mStartButton.setEnabled(true);
+                    mTimerText.setText("הכנס מס' תקין ולחץ שוב start");
                     // [END_EXCLUDE]
                 }
                 else if (e instanceof FirebaseTooManyRequestsException)
@@ -160,7 +186,12 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
             @Override
             public void onCodeSent(String verificationId, PhoneAuthProvider.ForceResendingToken token)
             {
-                //TODO go to next fragment
+                if(mVerifyWrapper.getVisibility() == View.GONE)
+                {
+                    AnimationUtils.slideDown(mStartWrapper);
+                    mVerifyWrapper.setVisibility(View.VISIBLE);
+                    AnimationUtils.slideUp(mVerifyWrapper);
+                }
                 // The SMS verification code has been sent to the provided phone number, we
                 // now need to ask the user_list_item to enter the code and then construct a credential
                 // by combining the code with a verification ID.
@@ -177,6 +208,39 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
             }
         };
         // [END phone_auth_callbacks]
+    }
+
+    // [START on_start_check_user]
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        // Check if user_list_item is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = FireBaseManager.getFirebaseAuth().getCurrentUser();
+        updateUI(currentUser);
+
+        // [START_EXCLUDE]
+        if (mVerificationInProgress && validatePhoneNumber())
+        {
+            startPhoneNumberVerification(mPhoneNumberField.getText().toString());
+        }
+        // [END_EXCLUDE]
+    }
+    // [END on_start_check_user]
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(KEY_VERIFY_IN_PROGRESS, mVerificationInProgress);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null) {
+            mVerificationInProgress = savedInstanceState.getBoolean(KEY_VERIFY_IN_PROGRESS);
+        }
     }
 
     // [START sign_in_with_phone]
@@ -202,13 +266,13 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
                     // Sign in failed, display a message_list_item and update the UI
                     Log.w(TAG, "signInWithCredential:failure", task.getException());
 
-                    /*if (task.getException() instanceof FirebaseAuthInvalidCredentialsException)
+                    if (task.getException() instanceof FirebaseAuthInvalidCredentialsException)
                     {
                         // The verification code entered was invalid
                         // [START_EXCLUDE silent]
                         mVerificationField.setError("Invalid code.");
                         // [END_EXCLUDE]
-                    }*/
+                    }
 
                     // [START_EXCLUDE silent]
                     // Update UI
@@ -234,7 +298,7 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
 
     private void startPhoneNumberVerification(String phoneNumber)
     {
-        //TODO button start set disable + start ui timer
+        startTimer();
         // [START start_phone_auth]
         PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber,        // Phone number to verify
                 60,                 // Timeout duration
@@ -246,8 +310,51 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
         mVerificationInProgress = true;
     }
 
+    private void startTimer()
+    {
+        final int i = 0;
+        final int[] timeCounter = {60};
+        mTimer = new Timer();
+        mTimer.scheduleAtFixedRate(new TimerTask()
+        {
+            public void run()
+            {
+                getActivity().runOnUiThread(new Runnable()
+                {
+                    public void run()
+                    {
+                        if (timeCounter[0] == i)
+                        {
+                            mTimerText.setText("לחץ כאן לשליחה מחדש");
+                            mTimerText.setClickable(true);
+                            mTimer.cancel();
+                            return;
+                        }
+
+                        String time = String.valueOf(timeCounter[0]);
+                        if (time.length() == 1)
+                        {
+                            time = "0" + time;
+                        }
+                        mTimerText.setText("00:" + time);
+                        timeCounter[0]--;
+                    }
+                });
+            }
+        }, 0, 1000);
+    }
+
+    private void verifyPhoneNumberWithCode(String verificationId, String code)
+    {
+        // [START verify_with_code]
+        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
+        // [END verify_with_code]
+        signInWithPhoneAuthCredential(credential);
+    }
+
     private void resendVerificationCode(String phoneNumber, PhoneAuthProvider.ForceResendingToken token)
     {
+        startTimer();
         PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber,        // Phone number to verify
                 60,                 // Timeout duration
                 TimeUnit.SECONDS,   // Unit of timeout
@@ -259,6 +366,18 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
     private void updateUI(int uiState)
     {
         updateUI(uiState, FireBaseManager.getFirebaseUser(), null);
+    }
+
+    private void updateUI(FirebaseUser user)
+    {
+        if (user != null)
+        {
+            updateUI(STATE_SIGNIN_SUCCESS, user);
+        }
+        else
+        {
+            updateUI(STATE_INITIALIZED);
+        }
     }
 
     private void updateUI(int uiState, FirebaseUser user)
@@ -278,26 +397,25 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
             case STATE_INITIALIZED:
                 // Initialized state, show only the phone number field and start button
                 enableViews(mStartButton, mPhoneNumberField);
-                disableViews(mResendButton);
                 mDetailText.setText(null);
                 break;
             case STATE_CODE_SENT:
                 // Code sent state, show the verification field, the
-                enableViews(mResendButton, mPhoneNumberField);
+                enableViews(mPhoneNumberField);
                 disableViews(mStartButton);
                 mDetailText.setText(R.string.status_code_sent);
                 break;
             case STATE_VERIFY_FAILED:
                 // Verification has failed, show all options
-                enableViews(mStartButton, mResendButton, mPhoneNumberField);
+                enableViews(mStartButton, mPhoneNumberField);
                 mDetailText.setText(R.string.status_verification_failed);
                 break;
             case STATE_VERIFY_SUCCESS:
                 // Verification has succeeded, proceed to firebase sign in
-                disableViews(mStartButton, mResendButton, mPhoneNumberField);
+                disableViews(mStartButton, mPhoneNumberField);
                 mDetailText.setText(R.string.status_verification_succeeded);
 
-               /* // Set the verification text based on the credential
+                // Set the verification text based on the credential
                 if (cred != null)
                 {
                     if (cred.getSmsCode() != null)
@@ -308,7 +426,7 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
                     {
                         mVerificationField.setText(R.string.instant_validation);
                     }
-                }*/
+                }
 
                 break;
             case STATE_SIGNIN_FAILED:
@@ -339,7 +457,7 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
 
             mTitleText.setText(FireBaseManager.getFirebaseUserPhone());
             mStatusText.setText(R.string.signed_in);
-            if (user.getDisplayName() == null ||user.getDisplayName().equals(""))
+            if (user.getDisplayName() == null || user.getDisplayName().equals(""))
             {
                 mDetailText.setVisibility(View.GONE);
             }
@@ -376,16 +494,39 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
         switch (v.getId())
         {
             case R.id.get_sms_button_start_verification:
+
                 if (!validatePhoneNumber())
                 {
                     return;
                 }
-
+                mStartButton.setEnabled(false);
                 startPhoneNumberVerification(mPhoneNumberField.getText().toString());
                 break;
 
-            case R.id.get_sms_button_resend:
+            case R.id.get_sms_timer:
                 resendVerificationCode(mPhoneNumberField.getText().toString(), mResendToken);
+                break;
+
+            case R.id.button_verify_phone:
+                mTimerText.setText("");
+                mTimer.cancel();
+
+                String code = mVerificationField.getText().toString();
+                if (TextUtils.isEmpty(code))
+                {
+                    mVerificationField.setError("Cannot be empty.");
+                    return;
+                }
+
+                verifyPhoneNumberWithCode(mVerificationId, code);
+                break;
+
+            case R.id.button_send_name:
+                if (!mNameField.getText().toString().equals(""))
+                {
+                    FireBaseManager.updateName(mNameField.getText().toString());
+                    ((MainActivity) getActivity()).goToFirstFragment();
+                }
                 break;
         }
     }
