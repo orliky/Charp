@@ -38,10 +38,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class GetSMSFragment extends Fragment implements View.OnClickListener
+public class PhoneAuthFragment extends Fragment implements View.OnClickListener
 {
 
-    private static final String TAG = GetSMSFragment.class.getSimpleName();
+    private static final String TAG = PhoneAuthFragment.class.getSimpleName();
 
     private static final String KEY_VERIFY_IN_PROGRESS = "key_verify_in_progress";
 
@@ -78,7 +78,7 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
     private RelativeLayout mStartWrapper;
     private RelativeLayout mVerifyWrapper;
 
-    public GetSMSFragment()
+    public PhoneAuthFragment()
     {
 
     }
@@ -253,6 +253,7 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
             {
                 if (task.isSuccessful())
                 {
+                    mTimer.cancel();
                     // Sign in success, update UI with the signed-in user_list_item's information
                     Log.d(TAG, "signInWithCredential:success");
 
@@ -313,7 +314,7 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
     private void startTimer()
     {
         final int i = 0;
-        final int[] timeCounter = {60};
+        final int[] timeCounter = {59};
         mTimer = new Timer();
         mTimer.scheduleAtFixedRate(new TimerTask()
         {
@@ -509,7 +510,6 @@ public class GetSMSFragment extends Fragment implements View.OnClickListener
 
             case R.id.button_verify_phone:
                 mTimerText.setText("");
-                mTimer.cancel();
 
                 String code = mVerificationField.getText().toString();
                 if (TextUtils.isEmpty(code))

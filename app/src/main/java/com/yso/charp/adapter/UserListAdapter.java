@@ -12,7 +12,10 @@ import com.yso.charp.R;
 import com.yso.charp.model.User;
 import com.yso.charp.utils.ContactsUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by Admin on 21-Nov-17.
@@ -21,7 +24,7 @@ import java.util.HashMap;
 public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
     private HashMap<String, User> mData = new HashMap<>();
-    private String[] mKeys;
+    private List<String> mKeys;
     private LayoutInflater mInflater;
     private ChatItemClickListener mClickListener;
     private Context mContext;
@@ -31,13 +34,15 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.mContext = context;
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
-        mKeys = mData.keySet().toArray(new String[data.size()]);
+        mKeys = new ArrayList<>(mData.keySet());
+        Collections.sort(mKeys);
     }
 
     public void setItems(HashMap<String, User> data)
     {
         mData = data;
-        mKeys = mData.keySet().toArray(new String[data.size()]);
+        mKeys = new ArrayList<>(mData.keySet());
+        Collections.sort(mKeys);
         notifyDataSetChanged();
     }
 
@@ -70,7 +75,7 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     public Object getItem(int position)
     {
-        return mData.get(mKeys[position]);
+        return mData.get(mKeys.get(position));
     }
 
     public class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
@@ -81,8 +86,8 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         public UserViewHolder(View itemView)
         {
             super(itemView);
-            mName = (TextView) itemView.findViewById(R.id.user_name);
-            mPhone = (TextView) itemView.findViewById(R.id.user_phone);
+            mName = itemView.findViewById(R.id.user_name);
+            mPhone = itemView.findViewById(R.id.user_phone);
             itemView.setOnClickListener(this);
         }
 
@@ -91,7 +96,7 @@ public class UserListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         {
             if (mClickListener != null)
             {
-                mClickListener.onItemClick(mKeys[getAdapterPosition()]);
+                mClickListener.onItemClick(mKeys.get(getAdapterPosition()));
             }
         }
     }

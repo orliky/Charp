@@ -1,10 +1,10 @@
 package com.yso.charp.activity;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
@@ -15,28 +15,27 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ValueEventListener;
 import com.yso.charp.Interface.SignOutListener;
 import com.yso.charp.R;
 import com.yso.charp.fragment.ChatFragment;
 import com.yso.charp.fragment.ChatListFragment;
-import com.yso.charp.fragment.GetSMSFragment;
 import com.yso.charp.fragment.MainFragment;
+import com.yso.charp.fragment.PhoneAuthFragment;
 import com.yso.charp.fragment.UserListFragment;
 import com.yso.charp.mannager.FireBaseManager;
+import com.yso.charp.mannager.PermissionManager;
 
 import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_CLIENT_USERS;
 import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_MESSAGES;
 import static com.yso.charp.mannager.FireBaseManager.getDatabaseReferencem;
 import static com.yso.charp.mannager.FireBaseManager.getFirebaseUserPhone;
+import static com.yso.charp.mannager.PermissionManager.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE;
+import static com.yso.charp.mannager.PermissionManager.PERMISSIONS_REQUEST_READ_CONTACTS;
 
 public class MainActivity extends AppCompatActivity
 {
     public static final String MY_FRAGMENT = "MY_FRAGMENT";
     private static String TAG = MainActivity.class.getSimpleName();
-
-    private static final int PERMISSIONS_REQUEST_READ_CONTACTS = 1;
-    private static String[] PERMISSIONS_CONTACT = {Manifest.permission.READ_CONTACTS};
 
     private FirebaseUser mFirebaseUser;
 
@@ -55,21 +54,9 @@ public class MainActivity extends AppCompatActivity
 
         mFirebaseUser = FireBaseManager.getFirebaseUser();
 
-        checkPermission();
-    }
-
-    @RequiresApi (api = Build.VERSION_CODES.M)
-    private void checkPermission()
-    {
-        if (checkSelfPermission(PERMISSIONS_CONTACT[0]) > PackageManager.PERMISSION_GRANTED)
+        if (PermissionManager.checkContactPermission(MainActivity.this))
         {
-            Log.i(TAG, "Contact permissions have already been granted. Displaying contact details.");
             goToFirstFragment();
-        }
-        else
-        {
-            Log.i(TAG, "Contact permissions has NOT been granted. Requesting permission.");
-            requestPermissions(PERMISSIONS_CONTACT, PERMISSIONS_REQUEST_READ_CONTACTS);
         }
     }
 
@@ -79,7 +66,7 @@ public class MainActivity extends AppCompatActivity
         {
             /*startActivity(new Intent(this, PhoneAuthActivity.class));
             finish();*/
-            getSupportFragmentManager().beginTransaction().add(R.id.container, new GetSMSFragment()).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.container, new PhoneAuthFragment()).commit();
         }
         else
         {
@@ -144,24 +131,44 @@ public class MainActivity extends AppCompatActivity
         switch (requestCode)
         {
             case PERMISSIONS_REQUEST_READ_CONTACTS:
-            {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 {
                     Log.d(TAG, "permission granted");
-                    goToFirstFragment();
+                    PermissionManager.checkStoragePermission(MainActivity.this);
                 }
                 else
                 {
                     Log.d(TAG, "permission denied");
-                    Snackbar.make(findViewById(android.R.id.content), "You mast approve it", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-                    checkPermission();
+                    Snackbar.make(findViewById(android.R.id.content), "ללא אישור גישה האפליקציה לא תפעל כראוי", Snackbar.LENGTH_LONG).setAction("Action", null).show();
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            finish();
+                        }
+                    }, 1000);
                 }
-            }
+                break;
+
+            case MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    Log.d(TAG, "permission granted");
+                }
+                else
+                {
+                    Log.d(TAG, "permission denied");
+                }
+                goToFirstFragment();
+                break;
         }
     }
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
 
         ChatListFragment.getInstance().refreshAdapter();
@@ -172,7 +179,7 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed()
     {
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(MY_FRAGMENT);
-        if(fragment instanceof ChatFragment)
+        if (fragment instanceof ChatFragment)
         {
             setTitle("Charp");
             android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();

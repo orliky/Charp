@@ -12,6 +12,7 @@
 
 package com.yso.charp.utils;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.Configuration;
@@ -38,6 +39,7 @@ import android.widget.ImageView;
 import android.widget.OverScroller;
 import android.widget.Scroller;
 
+@SuppressLint ("AppCompatCustomView")
 public class TouchImageView extends ImageView {
 	
 	private static final String DEBUG = "DEBUG";

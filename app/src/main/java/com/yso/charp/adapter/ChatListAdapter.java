@@ -12,12 +12,17 @@ import com.yso.charp.R;
 import com.yso.charp.model.ChatTitle;
 import com.yso.charp.utils.ContactsUtils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
     private HashMap<String, ChatTitle> mData = new HashMap<>();
-    private String[] mKeys;
+    private List<String> mKeys;
     private LayoutInflater mInflater;
     private ChatItemClickListener mClickListener;
     private Context mContext;
@@ -27,13 +32,15 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         this.mContext = context;
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
-        mKeys = mData.keySet().toArray(new String[data.size()]);
+        mKeys = new ArrayList<>(mData.keySet());
+        Collections.sort(mKeys);
     }
 
     public void setItems(HashMap<String, ChatTitle> data)
     {
         mData = data;
-        mKeys = mData.keySet().toArray(new String[data.size()]);
+        mKeys = new ArrayList<>(mData.keySet());
+        Collections.sort(mKeys);
         notifyDataSetChanged();
     }
 
@@ -64,7 +71,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     private Object getItem(int position)
     {
-        return mData.get(mKeys[position]);
+        return mData.get(mKeys.get(position));
     }
 
     public class ChatViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener
@@ -85,7 +92,7 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         {
             if (mClickListener != null)
             {
-                mClickListener.onItemClick(mKeys[getAdapterPosition()]);
+                mClickListener.onItemClick(mKeys.get(getAdapterPosition()));
             }
         }
     }

@@ -186,15 +186,15 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
     public void onItemClick(final String key)
     {
         PersistenceManager.getInstance().setContactPhoneNumbers(ContactsUtils.getAllContactPhoneNumbers(getActivity()));
-        HashMap users = PersistenceManager.getInstance().getUsersMap();
-        if (users.get(key) == null)
-        {
-            showNewUserDialog(key);
-        }
-        else
-        {
+//        HashMap users = PersistenceManager.getInstance().getUsersMap();
+//        if (users.get(key) == null)
+//        {
+//            showNewUserDialog(key);
+//        }
+//        else
+//        {
             ((MainActivity) getActivity()).goToChatFragment(key);
-        }
+//        }
     }
 
     private void showNewUserDialog(final String key)
