@@ -1,12 +1,15 @@
 package com.yso.charp.fragment;
 
 
+import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,10 +29,12 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.rilixtech.CountryCodePicker;
 import com.yso.charp.R;
 import com.yso.charp.activity.MainActivity;
 import com.yso.charp.mannager.FireBaseManager;
 import com.yso.charp.utils.AnimationUtils;
+import com.yso.charp.utils.handlers.UiHandlerWrapper;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -59,6 +64,7 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallbacks;
     private Timer mTimer;
+    private TimerTask mTimerTask;
 
     private ViewGroup mPhoneNumberViews;
 
@@ -68,6 +74,7 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
     private TextView mTimerText;
 
     private EditText mPhoneNumberField;
+    private CountryCodePicker mCountryCodePicker;
     private EditText mVerificationField;
     private EditText mNameField;
 
@@ -77,6 +84,8 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
 
     private RelativeLayout mStartWrapper;
     private RelativeLayout mVerifyWrapper;
+
+    private UiHandlerWrapper mHandlerWrapper = new UiHandlerWrapper();
 
     public PhoneAuthFragment()
     {
@@ -101,9 +110,9 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
         mStatusText = view.findViewById(R.id.get_sms_status);
         mDetailText = view.findViewById(R.id.get_sms_detail);
         mTimerText = view.findViewById(R.id.get_sms_timer);
-        mTimerText.setClickable(false);
 
         mPhoneNumberField = view.findViewById(R.id.get_sms_field_phone_number);
+        mCountryCodePicker = (CountryCodePicker) view.findViewById(R.id.ccp);
         mVerificationField = (EditText) view.findViewById(R.id.field_verification_code);
         mNameField = (EditText) view.findViewById(R.id.field_user_name);
 
@@ -117,6 +126,7 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
         // Assign click listeners
         mStartButton.setOnClickListener(this);
         mTimerText.setOnClickListener(this);
+        mTimerText.setClickable(false);
         mVerifyButton.setOnClickListener(this);
         mSendNameButton.setOnClickListener(this);
 
@@ -163,8 +173,9 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
                 {
                     // Invalid request
                     // [START_EXCLUDE]
-                    mPhoneNumberField.setError("Invalid phone number.");
+                    mPhoneNumberField.setError("מספר לא תקין");
                     mTimer.cancel();
+                    mTimerTask.cancel();
                     mStartButton.setEnabled(true);
                     mTimerText.setText("הכנס מס' תקין ולחץ שוב start");
                     // [END_EXCLUDE]
@@ -173,7 +184,10 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
                 {
                     // The SMS quota for the project has been exceeded
                     // [START_EXCLUDE]
-                    Snackbar.make(getActivity().findViewById(android.R.id.content), "Quota exceeded.", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(getActivity().findViewById(android.R.id.content), "חרגת ממכסת SMS", Snackbar.LENGTH_SHORT).show();
+                    mTimer.cancel();
+                    mTimerTask.cancel();
+                    mTimerText.setText("נסה בעוד כמה דקות start");
                     // [END_EXCLUDE]
                 }
 
@@ -186,7 +200,7 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
             @Override
             public void onCodeSent(String verificationId, PhoneAuthProvider.ForceResendingToken token)
             {
-                if(mVerifyWrapper.getVisibility() == View.GONE)
+                if (mVerifyWrapper.getVisibility() == View.GONE)
                 {
                     AnimationUtils.slideDown(mStartWrapper);
                     mVerifyWrapper.setVisibility(View.VISIBLE);
@@ -236,9 +250,11 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null) {
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState)
+    {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null)
+        {
             mVerificationInProgress = savedInstanceState.getBoolean(KEY_VERIFY_IN_PROGRESS);
         }
     }
@@ -254,6 +270,7 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
                 if (task.isSuccessful())
                 {
                     mTimer.cancel();
+                    mTimerTask.cancel();
                     // Sign in success, update UI with the signed-in user_list_item's information
                     Log.d(TAG, "signInWithCredential:success");
 
@@ -316,33 +333,37 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
         final int i = 0;
         final int[] timeCounter = {59};
         mTimer = new Timer();
-        mTimer.scheduleAtFixedRate(new TimerTask()
-        {
+        mTimerTask = new TimerTask() {
+            @Override
             public void run()
             {
-                getActivity().runOnUiThread(new Runnable()
+                if (getActivity() != null)
                 {
-                    public void run()
+                    getActivity().runOnUiThread(new Runnable()
                     {
-                        if (timeCounter[0] == i)
+                        public void run()
                         {
-                            mTimerText.setText("לחץ כאן לשליחה מחדש");
-                            mTimerText.setClickable(true);
-                            mTimer.cancel();
-                            return;
+                            if (timeCounter[0] == i)
+                            {
+                                mTimerText.setText("לחץ כאן לשליחה מחדש");
+                                mTimerText.setClickable(true);
+                                mTimer.cancel();
+                                cancel();
+                                return;
+                            }
+                            String time = String.valueOf(timeCounter[0]);
+                            if (time.length() == 1)
+                            {
+                                time = "0" + time;
+                            }
+                            mTimerText.setText("00:" + time);
+                            timeCounter[0]--;
                         }
-
-                        String time = String.valueOf(timeCounter[0]);
-                        if (time.length() == 1)
-                        {
-                            time = "0" + time;
-                        }
-                        mTimerText.setText("00:" + time);
-                        timeCounter[0]--;
-                    }
-                });
+                    });
+                }
             }
-        }, 0, 1000);
+        };
+        mTimer.scheduleAtFixedRate(mTimerTask, 0, 1000);
     }
 
     private void verifyPhoneNumberWithCode(String verificationId, String code)
@@ -489,6 +510,7 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
         }
     }
 
+    @SuppressLint ("StringFormatInvalid")
     @Override
     public void onClick(View v)
     {
@@ -500,8 +522,12 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
                 {
                     return;
                 }
-                mStartButton.setEnabled(false);
-                startPhoneNumberVerification(mPhoneNumberField.getText().toString());
+                String num = mPhoneNumberField.getText().toString();
+                if (num.startsWith("0"))
+                {
+                    num = mPhoneNumberField.getText().toString().substring(1);
+                }
+                showAlertDialog(R.string.confirm_number_title, String.format(getString(R.string.confirm_number_message), "+" + mCountryCodePicker.getSelectedCountryCode() + num), "+" + mCountryCodePicker.getSelectedCountryCode() + num);
                 break;
 
             case R.id.get_sms_timer:
@@ -529,5 +555,32 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
                 }
                 break;
         }
+    }
+
+    private void showAlertDialog(final int title, final String message, final String num)
+    {
+        mHandlerWrapper.post(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                new AlertDialog.Builder(getActivity(), R.style.MyAlertDialogTheme).setCancelable(false).setTitle(title).setMessage(message).setPositiveButton(R.string.ok, new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        mStartButton.setEnabled(false);
+                        startPhoneNumberVerification(num);
+                    }
+                }).setNegativeButton("ערוך", new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+
+                    }
+                }).show();
+            }
+        });
     }
 }

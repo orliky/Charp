@@ -142,7 +142,10 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
                         chatTitle.setPhone(userMessagesEntry.getKey());
                         chatTitle.setLastMessage(getMessage(messagesMap));
 
-                        chatList.put(userMessagesEntry.getKey(), chatTitle);
+                        if(!chatTitle.getPhone().equals(FireBaseManager.getFirebaseUserPhone()))
+                        {
+                            chatList.put(userMessagesEntry.getKey(), chatTitle);
+                        }
                     }
                 }
                 PersistenceManager.getInstance().setChatsMap(chatList);

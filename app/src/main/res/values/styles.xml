@@ -61,4 +61,13 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/authui_colorPrimary</item>
     </style>
+
+    <style name="MyAlertDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+        <!-- Used for the buttons -->
+        <item name="colorAccent">@color/crystalBlue</item>
+        <!-- Used for the title and text -->
+        <item name="android:textColorPrimary">@color/darkGray</item>
+        <!-- Used for the background -->
+        <item name="android:background">@color/white</item>
+    </style>
 </resources>

@@ -2,7 +2,6 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "23.0.1"
     defaultConfig {
         applicationId "com.yso.charp"
         minSdkVersion 19
@@ -41,7 +40,12 @@ dependencies {
     //noinspection GradleCompatible
     compile 'com.google.android.gms:play-services-plus:11.6.0'
     compile 'com.google.android.gms:play-services-auth:11.6.0'
+    compile 'com.android.support:design:26.1.0'
+    compile('com.github.joielechong:countrycodepicker:2.1.5') {
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+    }
 }
+
 
 
 

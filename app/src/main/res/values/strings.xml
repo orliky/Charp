@@ -28,4 +28,7 @@
     <string name="hint_user_name">Enter your name</string>
     <string name="phone_title_text">Phone Number</string>
     <string name="desc_firebase_lockup">Firebase logo and name</string>
+    <string name="ok">Ok</string>
+    <string name="confirm_number_title">אישור מספר</string>
+    <string name="confirm_number_message">האם זהו המספר אליו יישלח ה-SMS?\n%s</string>
 </resources>

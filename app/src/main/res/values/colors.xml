@@ -7,4 +7,8 @@
 
     <color name="grey_100">#F5F5F5</color>
     <color name="grey_300">#E0E0E0</color>
+
+    <color name="crystalBlue">#00B9E6</color>
+    <color name="darkGray">#4D4D4D</color>
+    <color name="white">#FFFFFF</color>
 </resources>
