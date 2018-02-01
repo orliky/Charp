@@ -5,12 +5,14 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -23,7 +25,6 @@ import com.yso.charp.mannager.FireBaseManager;
 import com.yso.charp.mannager.PersistenceManager;
 import com.yso.charp.mannager.dataBase.UserRepo;
 import com.yso.charp.model.User;
-import com.yso.charp.utils.ContactsUtils;
 
 import java.util.HashMap;
 
@@ -43,6 +44,7 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
     private RecyclerView mRecyclerView;
     private HashMap<String, User> userList = new HashMap<>();
     private UserListAdapter mAdapter;
+    private TextView mNoUsersTitle;
     @SuppressLint ("StaticFieldLeak")
     private static UserListFragment mInstance;
     private UserRepo mUserRepo;
@@ -90,6 +92,8 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), new LinearLayoutManager(getContext()).getOrientation());
         mRecyclerView.addItemDecoration(dividerItemDecoration);
+        mNoUsersTitle = view.findViewById(R.id.no_users_title);
+
         initValueEventListener();
     }
 
@@ -98,6 +102,14 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
     {
         super.onResume();
         loadClientUsers();
+        if(userList.size() == 0)
+        {
+            mNoUsersTitle.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            mNoUsersTitle.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -147,7 +159,7 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
     @Override
     public void onItemClick(String key)
     {
-        ((MainActivity) getActivity()).goToChatFragment(key);
+        ((MainActivity) getActivity()).goToFragment(ChatFragment.newInstance(key), "");
     }
 
     public void refreshAdapter()

@@ -10,6 +10,7 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +21,7 @@ import com.yso.charp.R;
 import com.yso.charp.fragment.ChatFragment;
 import com.yso.charp.fragment.ChatListFragment;
 import com.yso.charp.fragment.MainFragment;
+import com.yso.charp.fragment.MyDetailsFragment;
 import com.yso.charp.fragment.PhoneAuthFragment;
 import com.yso.charp.fragment.UserListFragment;
 import com.yso.charp.mannager.FireBaseManager;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity
     private static String TAG = MainActivity.class.getSimpleName();
 
     private FirebaseUser mFirebaseUser;
+    private Toolbar mToolbar;
 
     @RequiresApi (api = Build.VERSION_CODES.M)
     @Override
@@ -45,6 +48,9 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mToolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(mToolbar);
 
         // Restore instance state
         if (savedInstanceState != null)
@@ -66,11 +72,14 @@ public class MainActivity extends AppCompatActivity
         {
             /*startActivity(new Intent(this, PhoneAuthActivity.class));
             finish();*/
+            mToolbar.setSubtitle("כניסה");
             getSupportFragmentManager().beginTransaction().add(R.id.container, new PhoneAuthFragment()).commit();
         }
         else
         {
-            getSupportFragmentManager().beginTransaction().add(R.id.container, new MainFragment()).commit();
+//            getSupportFragmentManager().beginTransaction().add(R.id.container, new MainFragment()).commit();
+            mToolbar.setSubtitle("צ'אטים");
+            getSupportFragmentManager().beginTransaction().add(R.id.container, ChatListFragment.getInstance()).commit();
         }
     }
 
@@ -97,6 +106,13 @@ public class MainActivity extends AppCompatActivity
                     finish();
                 }
             });
+        }
+
+        if (item.getItemId() == R.id.menu_account)
+        {
+            android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
+            ft.add(R.id.container, new MyDetailsFragment(), MY_FRAGMENT).commit();
         }
         return true;
     }
@@ -179,12 +195,9 @@ public class MainActivity extends AppCompatActivity
     public void onBackPressed()
     {
         Fragment fragment = getSupportFragmentManager().findFragmentByTag(MY_FRAGMENT);
-        if (fragment instanceof ChatFragment)
+        if (fragment instanceof ChatFragment || fragment instanceof UserListFragment)
         {
-            setTitle("Charp");
-            android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
-            ft.remove(getSupportFragmentManager().findFragmentById(R.id.container)).commit();
+            bacToFragment("צ'אטים");
         }
         else
         {
@@ -192,11 +205,19 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void goToChatFragment(String key)
+    private void bacToFragment(String title)
     {
-        ChatFragment chatFragment = ChatFragment.newInstance(key);
+        android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
+        ft.remove(getSupportFragmentManager().findFragmentById(R.id.container)).commit();
+        mToolbar.setSubtitle(title);
+    }
+
+    public void goToFragment(Fragment fragment, String title)
+    {
         android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
-        ft.add(R.id.container, chatFragment, MY_FRAGMENT).commit();
+        ft.add(R.id.container, fragment, MY_FRAGMENT).commit();
+        mToolbar.setSubtitle(title);
     }
 }

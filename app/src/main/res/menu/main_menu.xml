@@ -3,15 +3,15 @@
 
     <item
         android:id="@+id/menu_sign_out"
-        android:title="Sign out"
-        app:showAsAction="never"/>
-
-   <!-- <item
-        android:id="@+id/menu_user_list"
-        android:title="Users"
+        android:title="התנתק"
         app:showAsAction="never"/>
 
     <item
+        android:id="@+id/menu_account"
+        android:title="חשבון"
+        app:showAsAction="never"/>
+
+    <!--<item
         android:id="@+id/menu_chats_list"
         android:title="Chats"
         app:showAsAction="never"/>-->

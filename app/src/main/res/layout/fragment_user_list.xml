@@ -2,8 +2,17 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
+             android:background="#F5F2F2"
              tools:context="com.yso.charp.fragment.UserListFragment">
 
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/no_users_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:text="אין עדיין אנשי קשר להצגה"/>
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"

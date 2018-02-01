@@ -8,8 +8,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,6 +37,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import static com.yso.charp.activity.MainActivity.MY_FRAGMENT;
 import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_MESSAGES;
 import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_MESSAGES_LAST_MESSAGE;
 import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_MESSAGES_MESSAGE_TEXT;
@@ -48,9 +52,11 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
     private HashMap<String, ChatTitle> chatList = new HashMap<>();
     private ChatListAdapter mAdapter;
     private ProgressBar mProgressBar;
+    private TextView mNoChatsTitle;
     @SuppressLint ("StaticFieldLeak")
     private static ChatListFragment mInstance;
     private ValueEventListener mValueEventListener;
+    private FloatingActionButton myFab;
 
     public ChatListFragment()
     {
@@ -95,6 +101,14 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
         recyclerView.addItemDecoration(dividerItemDecoration);
 
         mProgressBar = view.findViewById(R.id.chat_list_progress);
+        mNoChatsTitle = view.findViewById(R.id.no_chats_title);
+        myFab = view.findViewById(R.id.fab);
+        myFab.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                ((MainActivity) getActivity()).goToFragment(UserListFragment.getInstance(), "אנשי קשר");
+            }
+        });
+
         initValueEventListener();
     }
 
@@ -103,6 +117,14 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
     {
         super.onResume();
         loadChatList();
+        if(chatList.size() == 0)
+        {
+            mNoChatsTitle.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            mNoChatsTitle.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -142,10 +164,7 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
                         chatTitle.setPhone(userMessagesEntry.getKey());
                         chatTitle.setLastMessage(getMessage(messagesMap));
 
-                        if(!chatTitle.getPhone().equals(FireBaseManager.getFirebaseUserPhone()))
-                        {
-                            chatList.put(userMessagesEntry.getKey(), chatTitle);
-                        }
+                        chatList.put(userMessagesEntry.getKey(), chatTitle);
                     }
                 }
                 PersistenceManager.getInstance().setChatsMap(chatList);
@@ -196,7 +215,7 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
 //        }
 //        else
 //        {
-            ((MainActivity) getActivity()).goToChatFragment(key);
+            ((MainActivity) getActivity()).goToFragment(ChatFragment.newInstance(key), "");
 //        }
     }
 

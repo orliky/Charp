@@ -2,6 +2,8 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
+             android:background="#F5F2F2"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
              tools:context="com.yso.charp.fragment.UserListFragment">
 
     <ProgressBar
@@ -10,6 +12,15 @@
         android:layout_height="50dp"
         android:layout_gravity="center"
         android:visibility="gone"/>
+
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/no_chats_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:text="אין עדיין שיחות להצגה"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list_of_chats"
@@ -20,5 +31,13 @@
         android:layout_marginBottom="16dp"
         android:divider="@android:color/transparent"
         android:dividerHeight="16dp"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="20dp"
+        app:srcCompat="@android:drawable/ic_input_add"/>
 
 </FrameLayout>

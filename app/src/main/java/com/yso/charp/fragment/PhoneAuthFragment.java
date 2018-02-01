@@ -234,7 +234,7 @@ public class PhoneAuthFragment extends Fragment implements View.OnClickListener
         updateUI(currentUser);
 
         // [START_EXCLUDE]
-        if (mVerificationInProgress && validatePhoneNumber())
+        if (!mVerificationInProgress && validatePhoneNumber())
         {
             startPhoneNumberVerification(mPhoneNumberField.getText().toString());
         }
