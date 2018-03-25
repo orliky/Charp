@@ -41,7 +41,6 @@ import static com.yso.charp.mannager.FireBaseManager.getFirebaseUserPhone;
 public class UserListFragment extends Fragment implements ChatItemClickListener
 {
 
-    private RecyclerView mRecyclerView;
     private HashMap<String, User> userList = new HashMap<>();
     private UserListAdapter mAdapter;
     private TextView mNoUsersTitle;
@@ -84,14 +83,14 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
         userList = PersistenceManager.getInstance().getUsersMap();
 
         mAdapter = new UserListAdapter(getContext(), userList);
-        mRecyclerView = view.findViewById(R.id.list_of_users);
+        RecyclerView recyclerView = view.findViewById(R.id.list_of_users);
 
         mAdapter.setClickListener(this);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mRecyclerView.setAdapter(mAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(mAdapter);
 
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mRecyclerView.getContext(), new LinearLayoutManager(getContext()).getOrientation());
-        mRecyclerView.addItemDecoration(dividerItemDecoration);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), new LinearLayoutManager(getContext()).getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
         mNoUsersTitle = view.findViewById(R.id.no_users_title);
 
         initValueEventListener();
@@ -102,7 +101,7 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
     {
         super.onResume();
         loadClientUsers();
-        if(userList.size() == 0)
+        if (userList.size() == 0)
         {
             mNoUsersTitle.setVisibility(View.VISIBLE);
         }
@@ -138,6 +137,7 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
                 for (DataSnapshot snapshot : dataSnapshot.getChildren())
                 {
                     User user = snapshot.getValue(User.class);
+                    assert user != null;
                     userList.put(user.getPhone(), user);
                     if (mUserRepo.getByPhone(user.getPhone()) == null)
                     {
@@ -159,7 +159,11 @@ public class UserListFragment extends Fragment implements ChatItemClickListener
     @Override
     public void onItemClick(String key)
     {
-        ((MainActivity) getActivity()).goToFragment(ChatFragment.newInstance(key), "");
+        android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
+        ft.replace(R.id.chat_container, ChatFragment.getInstance(key)).commit();
+
+        ((MainActivity) getActivity()).goToFragment(ChatFragment.getInstance(key), "");
     }
 
     public void refreshAdapter()

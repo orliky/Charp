@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
           package="com.yso.charp">
 
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
@@ -39,6 +40,8 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON"/>
             </intent-filter>
         </receiver>
+
+        <service android:name=".service.TimerService"/>
 
         <service android:name=".service.FirebaseNotificationService"/>
 

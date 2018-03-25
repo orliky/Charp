@@ -60,7 +60,8 @@ public class ChatListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         ChatTitle chatTitle = (ChatTitle) getItem(position);
         String contactName =  ContactsUtils.getContactName(chatTitle.getPhone());
         chatViewHolder.mName.setText(contactName);
-        chatViewHolder.mLastMessage.setText(chatTitle.getLastMessage());
+        String lastMessage = !chatTitle.getLastMessage().equals("") ? chatTitle.getLastMessage() : "- תמונה -";
+        chatViewHolder.mLastMessage.setText(lastMessage);
     }
 
     @Override

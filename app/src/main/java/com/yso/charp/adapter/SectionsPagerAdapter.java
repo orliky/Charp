@@ -40,10 +40,10 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter
 
         switch (position) {
             case 0:
-                return "CHATS";
+                return "צ'אטים";
 
             case 1:
-                return "USERS";
+                return "אנשי קשר";
 
             default:
                 return null;

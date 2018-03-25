@@ -24,6 +24,7 @@ public class PersistenceManager
     private static final String PREF_USER_LIST = "pref.USER_LIST";
     private static final String PREF_CHAT_LIST = "pref.CHAT_LIST";
     private static final String PREF_CONTACT_PHONE_LIST = "pref.CONTACT_PHONE_LIST";
+    private static final String PREF_VERIFICATION_ID = "pref.VERIFICATION_ID";
 
     private static PersistenceManager msInstance;
     private Gson mGson;
@@ -116,5 +117,15 @@ public class PersistenceManager
         {}.getType();
 
         return mGson.fromJson(branchMapDataString, listType);
+    }
+
+    public void setVerificationId(String verificationId)
+    {
+        SecurePreferences.getInstance().setString(PREF_VERIFICATION_ID, verificationId);
+    }
+
+    public String getVerificationId()
+    {
+        return SecurePreferences.getInstance().getString(PREF_VERIFICATION_ID, null);
     }
 }

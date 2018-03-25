@@ -6,13 +6,6 @@
              xmlns:app="http://schemas.android.com/apk/res-auto"
              tools:context="com.yso.charp.fragment.UserListFragment">
 
-    <ProgressBar
-        android:id="@+id/chat_list_progress"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center"
-        android:visibility="gone"/>
-
     <TextView
         android:visibility="gone"
         android:id="@+id/no_chats_title"
@@ -32,12 +25,11 @@
         android:divider="@android:color/transparent"
         android:dividerHeight="16dp"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
-        app:srcCompat="@android:drawable/ic_input_add"/>
+    <!--<FrameLayout
+        android:visibility="invisible"
+        android:id="@+id/chat_container"
+        android:layout_below="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>-->
 
 </FrameLayout>

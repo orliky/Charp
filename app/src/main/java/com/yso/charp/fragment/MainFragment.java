@@ -8,6 +8,7 @@ import android.provider.ContactsContract;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -48,6 +49,8 @@ public class MainFragment extends Fragment
     private SectionsPagerAdapter mSectionsPagerAdapter;
     //    private AppBarLayout mAppBarLayout;
     private ValueEventListener mValueEventListener;
+    private FloatingActionButton myFab;
+
 
     public MainFragment()
     {
@@ -85,9 +88,56 @@ public class MainFragment extends Fragment
         mSectionsPagerAdapter = new SectionsPagerAdapter(getActivity().getSupportFragmentManager());
 
         mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+            {
+
+            }
+
+            @Override
+            public void onPageSelected(int position)
+            {
+                if (position == 0)
+                {
+                    myFab.setImageResource(R.drawable.sym_action_add);
+                }
+                else
+                {
+                    myFab.setImageResource(R.drawable.ic_menu_back);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state)
+            {
+
+            }
+        });
 
         mTabLayout = view.findViewById(R.id.main_tabs);
         mTabLayout.setupWithViewPager(mViewPager);
+
+        myFab = view.findViewById(R.id.fab);
+        myFab.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                slidePager();
+            }
+        });
+    }
+
+    private void slidePager()
+    {
+        if (mViewPager.getCurrentItem() == 0)
+        {
+            mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1);
+        }
+        else
+        {
+            mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1);
+        }
     }
 
     private void initValueEventListener()

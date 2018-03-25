@@ -96,34 +96,27 @@ public class ChatFragment extends Fragment implements ImageClickListener
 
     }
 
-    public static ChatFragment newInstance(String key)
+    public static ChatFragment newInstance()
     {
-        Bundle bundle = new Bundle();
-        bundle.putString(USER_PHONE, key);
-
-        ChatFragment chatFragment = new ChatFragment();
-        chatFragment.setArguments(bundle);
-        return chatFragment;
+        return new ChatFragment();
     }
 
     public static ChatFragment getInstance(String key)
     {
         if (mInstance == null)
         {
-            mInstance = newInstance(key);
+            mInstance = newInstance();
         }
+        Bundle bundle = new Bundle();
+        bundle.putString(USER_PHONE, key);
+        mInstance.setArguments(bundle);
         return mInstance;
     }
 
-    @SuppressLint ("NewApi")
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    public void onCreate(@Nullable Bundle savedInstanceState)
     {
-        View view = inflater.inflate(R.layout.fragment_chat, container, false);
-
-        mChatMessageRepo = new ChatMessageRepo();
-
-        input = view.findViewById(R.id.input);
+        super.onCreate(savedInstanceState);
 
         mRootRef = getDatabaseReferencem();
         mCurrentUserId = FireBaseManager.getFirebaseUserPhone();
@@ -135,9 +128,19 @@ public class ChatFragment extends Fragment implements ImageClickListener
             mChatUser = bundle.getString(USER_PHONE);
             getActivity().setTitle(ContactsUtils.getContactName(mChatUser));
         }
+        mChatMessageRepo = new ChatMessageRepo();
+        messagesList.clear();
+        messagesList = mChatMessageRepo.getAllByChat(mCurrentUserId, mChatUser);
+    }
+
+    @SuppressLint ("NewApi")
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        View view = inflater.inflate(R.layout.fragment_chat, container, false);
+        input = view.findViewById(R.id.input);
 
         mRecyclerView = view.findViewById(R.id.list_of_messages);
-        initListFromDB();
         mAdapter = new ChatMessageAdapter(getContext(), messagesList);
 
         initChildEventListener();
@@ -148,7 +151,6 @@ public class ChatFragment extends Fragment implements ImageClickListener
 
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(linearLayout);
-
         mRecyclerView.setAdapter(mAdapter);
 
         mImageView = view.findViewById(R.id.image_input);
@@ -163,7 +165,6 @@ public class ChatFragment extends Fragment implements ImageClickListener
         });
 
         mAddContact = view.findViewById(R.id.add_contact);
-
         mAddContact.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -214,7 +215,9 @@ public class ChatFragment extends Fragment implements ImageClickListener
                         getImage(chatMessage);
                         messagesList.add(chatMessage);
                         //add to DB
-                        mChatMessageRepo.insert(dataSnapshot.getKey(), mChatUser, chatMessage);
+                        assert chatMessage != null;
+                        String other = chatMessage.getMessageUser().equals(mCurrentUserId) ? mChatUser : mCurrentUserId;
+                        mChatMessageRepo.insert(dataSnapshot.getKey(), other, chatMessage);
                     }
                     mAdapter.notifyDataSetChanged();
                     mRecyclerView.scrollToPosition(mAdapter.getItemCount() - 1);

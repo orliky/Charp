@@ -49,8 +49,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mToolbar = findViewById(R.id.my_toolbar);
-        setSupportActionBar(mToolbar);
+//        mToolbar = findViewById(R.id.my_toolbar);
+//        setSupportActionBar(mToolbar);
 
         // Restore instance state
         if (savedInstanceState != null)
@@ -72,14 +72,14 @@ public class MainActivity extends AppCompatActivity
         {
             /*startActivity(new Intent(this, PhoneAuthActivity.class));
             finish();*/
-            mToolbar.setSubtitle("כניסה");
+//            mToolbar.setSubtitle("כניסה");
             getSupportFragmentManager().beginTransaction().add(R.id.container, new PhoneAuthFragment()).commit();
         }
         else
         {
-//            getSupportFragmentManager().beginTransaction().add(R.id.container, new MainFragment()).commit();
-            mToolbar.setSubtitle("צ'אטים");
-            getSupportFragmentManager().beginTransaction().add(R.id.container, ChatListFragment.getInstance()).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.container, new MainFragment()).commit();
+//            mToolbar.setSubtitle("צ'אטים");
+//            getSupportFragmentManager().beginTransaction().add(R.id.container, ChatListFragment.getInstance()).commit();
         }
     }
 
@@ -194,10 +194,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackPressed()
     {
-        Fragment fragment = getSupportFragmentManager().findFragmentByTag(MY_FRAGMENT);
-        if (fragment instanceof ChatFragment || fragment instanceof UserListFragment)
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.chat_container);
+        if (fragment != null && !fragment.isHidden())
         {
-            bacToFragment("צ'אטים");
+            bacToFragment("");
         }
         else
         {
@@ -209,15 +209,15 @@ public class MainActivity extends AppCompatActivity
     {
         android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left);
-        ft.remove(getSupportFragmentManager().findFragmentById(R.id.container)).commit();
-        mToolbar.setSubtitle(title);
+        ft.hide(getSupportFragmentManager().findFragmentById(R.id.chat_container)).commit();
+//        mToolbar.setSubtitle(title);
     }
 
     public void goToFragment(Fragment fragment, String title)
     {
         android.support.v4.app.FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
-        ft.add(R.id.container, fragment, MY_FRAGMENT).commit();
-        mToolbar.setSubtitle(title);
+        ft.show(fragment).commit();
+//        mToolbar.setSubtitle(title);
     }
 }

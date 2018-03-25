@@ -18,6 +18,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -37,7 +39,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static com.yso.charp.activity.MainActivity.MY_FRAGMENT;
 import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_MESSAGES;
 import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_MESSAGES_LAST_MESSAGE;
 import static com.yso.charp.mannager.FireBaseManager.FB_CHILD_MESSAGES_MESSAGE_TEXT;
@@ -51,12 +52,18 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
 
     private HashMap<String, ChatTitle> chatList = new HashMap<>();
     private ChatListAdapter mAdapter;
-    private ProgressBar mProgressBar;
     private TextView mNoChatsTitle;
     @SuppressLint ("StaticFieldLeak")
     private static ChatListFragment mInstance;
     private ValueEventListener mValueEventListener;
-    private FloatingActionButton myFab;
+
+//    private HashMap<String, FrameLayout> frameList = new HashMap<>();
+//    private FrameLayout mContainer;
+
+//    public FrameLayout getContainer()
+//    {
+//        return mContainer;
+//    }
 
     public ChatListFragment()
     {
@@ -88,6 +95,8 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
     {
         super.onViewCreated(view, savedInstanceState);
 
+//        mContainer = view.findViewById(R.id.chat_container);
+
         chatList = PersistenceManager.getInstance().getChatsMap();
 
         mAdapter = new ChatListAdapter(getContext(), chatList);
@@ -100,14 +109,7 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), new LinearLayoutManager(getContext()).getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
 
-        mProgressBar = view.findViewById(R.id.chat_list_progress);
         mNoChatsTitle = view.findViewById(R.id.no_chats_title);
-        myFab = view.findViewById(R.id.fab);
-        myFab.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                ((MainActivity) getActivity()).goToFragment(UserListFragment.getInstance(), "אנשי קשר");
-            }
-        });
 
         initValueEventListener();
     }
@@ -117,7 +119,12 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
     {
         super.onResume();
         loadChatList();
-        if(chatList.size() == 0)
+        showEmptyTitle();
+    }
+
+    private void showEmptyTitle()
+    {
+        if (chatList.size() == 0)
         {
             mNoChatsTitle.setVisibility(View.VISIBLE);
         }
@@ -139,7 +146,6 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
 
     private void loadChatList()
     {
-        //        mProgressBar.setVisibility(View.VISIBLE);
         FireBaseManager.loadChatList(mValueEventListener);
     }
 
@@ -154,10 +160,9 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
                 if (userMessagesMap != null)
                 {
 
-                    Iterator iterator = userMessagesMap.entrySet().iterator();
-                    while (iterator.hasNext())
+                    for (Object o : userMessagesMap.entrySet())
                     {
-                        Map.Entry<String, String> userMessagesEntry = (Map.Entry<String, String>) iterator.next();
+                        Map.Entry<String, String> userMessagesEntry = (Map.Entry<String, String>) o;
                         Map messagesMap = (Map) userMessagesMap.get(userMessagesEntry.getKey());
 
                         ChatTitle chatTitle = new ChatTitle();
@@ -165,17 +170,28 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
                         chatTitle.setLastMessage(getMessage(messagesMap));
 
                         chatList.put(userMessagesEntry.getKey(), chatTitle);
+
+                        /*FrameLayout rowLayout = new FrameLayout(getActivity());
+                        String str = userMessagesEntry.getKey().replace("+", "");
+                        rowLayout.setId((int) Double.parseDouble(str.trim()));
+
+                        frameList.put(userMessagesEntry.getKey(), rowLayout);
+                        android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                        ft.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
+                        ft.add(rowLayout.getId(), ChatFragment.getInstance(userMessagesEntry.getKey()), "tag").commit();
+
+                        mContainer.addView(rowLayout);*/
                     }
+                    showEmptyTitle();
                 }
                 PersistenceManager.getInstance().setChatsMap(chatList);
-                //                mProgressBar.setVisibility(View.GONE);
                 mAdapter.setItems(chatList);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError)
             {
-                //                mProgressBar.setVisibility(View.GONE);
+
             }
         };
     }
@@ -208,15 +224,27 @@ public class ChatListFragment extends Fragment implements ChatItemClickListener
     public void onItemClick(final String key)
     {
         PersistenceManager.getInstance().setContactPhoneNumbers(ContactsUtils.getAllContactPhoneNumbers(getActivity()));
-//        HashMap users = PersistenceManager.getInstance().getUsersMap();
-//        if (users.get(key) == null)
-//        {
-//            showNewUserDialog(key);
-//        }
-//        else
-//        {
-            ((MainActivity) getActivity()).goToFragment(ChatFragment.newInstance(key), "");
-//        }
+        //        HashMap users = PersistenceManager.getInstance().getUsersMap();
+        //        if (users.get(key) == null)
+        //        {
+        //            showNewUserDialog(key);
+        //        }
+        //        else
+        //        {
+
+
+        android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.enter_from_left, R.anim.exit_to_right);
+        ft.replace(R.id.chat_container, ChatFragment.getInstance(key)).commit();
+
+        ((MainActivity) getActivity()).goToFragment(ChatFragment.getInstance(key), "");
+
+
+        /*Fragment fragment = getActivity().getSupportFragmentManager().findFragmentById(frameList.get(key).getId());
+        ((MainActivity) getActivity()).goToFragment(fragment, "");
+        mContainer.setVisibility(View.VISIBLE);*/
+
+        //        }
     }
 
     private void showNewUserDialog(final String key)
